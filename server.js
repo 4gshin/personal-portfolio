@@ -12,6 +12,7 @@ import Message from './models/Message.js';
 
 dotenv.config();
 const app = express();
+app.set('trust proxy', 1);
 
 // sec and middleware
 app.use(helmet());
@@ -64,9 +65,9 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
       const token = jwt.sign({ user: username }, process.env.JWT_SECRET, { expiresIn: '24h' });
       res.cookie('admin_token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000
+        secure: true,
+        sameSite: 'None',
+        maxAge: 3600000 
       });
       return res.json({ success: true });
     }

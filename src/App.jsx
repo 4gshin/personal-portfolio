@@ -16,7 +16,8 @@ const Home = () => {
       const response = await fetch(`${API_BASE}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        credentials: 'include'
       });
       const data = await response.json();
       if (response.ok) {
