@@ -78,7 +78,7 @@ const Admin = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await(`${API_BASE}/admin/check`, { credentials: 'include' });
+        const res = await fetch (`${API_BASE}/admin/check`, { credentials: 'include' });
         if (res.ok) {
           setIsAuthenticated(true);
           fetchMessages();
