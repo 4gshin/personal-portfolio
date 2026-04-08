@@ -1,21 +1,73 @@
-<<<<<<< HEAD
-# personal-portfolio
-Developed a responsive full-stack web application with a Node.js backend and React frontend, integrating a robust message handling system and modern UI/UX principles for a seamless, interactive user experience.
-=======
-# React + Vite
+# 🌐 Personal Portfolio Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to my personal portfolio website!  
+This project showcases my work, skills, and passion for building modern web applications.
 
-Currently, two official plugins are available:
+🌐 **Live Demo:** https://agshin.xyz  
+📂 **Repository:** [personal-portfolio](https://github.com/4gshin/personal-portfolio)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🧠 About The Project
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This is a **responsive full-stack portfolio application** built to present my projects, skills, and provide an interactive way for users to connect with me.
 
-## Expanding the ESLint configuration
+It combines a clean and modern UI/UX with a backend-powered system for handling real user interactions and storing messages efficiently.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
->>>>>>> d4d0578 (Full-stack architecture is live)
+> Focused on structure, detail, and creating experiences that actually make sense.
+
+---
+
+## ⚙️ Tech Stack
+
+### 💻 Frontend
+- React.js
+- Vite
+- CSS3 / Custom Styling
+
+### 🔧 Backend
+- Node.js
+- Express.js
+- MongoDB
+
+---
+
+## ✨ Features
+
+- 📱 Fully responsive design (mobile-friendly)
+- 🎨 Clean and modern UI/UX
+- 📩 Functional contact form with backend integration
+- 🔧 Scalable architecture for future features
+
+---
+
+## 📬 Contact System
+
+Users can send messages directly through the website via the contact section.  
+Each message is processed by the backend API and securely stored in the database for future access and management.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.  
+Feel free to use, modify, and distribute this project.
+
+See the [LICENSE](LICENSE) file for more details.
+
+---
+
+## 🛠️ Installation & Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/4gshin/personal-portfolio.git
+
+# Navigate into the project folder
+cd personal-portfolio
+
+# Install dependencies
+npm install
+
+# Start the frontend
+npm run dev
