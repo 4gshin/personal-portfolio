@@ -9,6 +9,8 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import Joi from 'joi'; 
 import Message from './models/Message.js';
+import axios from 'axios'; 
+
 
 dotenv.config();
 const app = express();
@@ -117,6 +119,34 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   }
 });
 
+
+
+// Serverin oyaq qalıb-qalmadığını yoxlamaq üçün sadə endpoint
+app.get('/api/ping', (req, res) => {
+  res.status(200).send('pong');
+});
+
+// 2. Sonra Cron Job funksiyasını yazırıq
+const PING_INTERVAL = 14 * 60 * 1000; 
+const URL = `${process.env.SERVER_URL}/api/ping`;
+
+function keepAlive() {
+  setInterval(async () => {
+    try {
+      // Artıq import etdiyimiz axios-u burada rahat istifadə edirik
+      const response = await axios.get(URL);
+      console.log(`Self-ping sent to ${URL}. Status: ${response.status}`);
+    } catch (error) {
+      console.error(`Self-ping failed: ${error.message}`);
+    }
+  }, PING_INTERVAL);
+}
+
+
+// Funksiyanı işə sal
+keepAlive();
+
 mongoose.connect(process.env.MONGODB_URI).then(() => {
   app.listen(process.env.PORT || 5001, () => console.log("Server is running..."));
 });
+
