@@ -121,21 +121,20 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 
 
 
-// Serverin oyaq qalıb-qalmadığını yoxlamaq üçün sadə endpoint
+
 app.get('/api/ping', (req, res) => {
   res.status(200).send('pong');
 });
 
-// 2. Sonra Cron Job funksiyasını yazırıq
-const PING_INTERVAL = 14 * 60 * 1000; 
-const URL = `${process.env.SERVER_URL}/api/ping`;
+// Cron Job funksiyası
+const PING_INTERVAL = 14 * 60 * 1000;
+const URL = "https://portfolio-api-1ak2.onrender.com/api/ping".trim();
 
 function keepAlive() {
   setInterval(async () => {
     try {
-      // Artıq import etdiyimiz axios-u burada rahat istifadə edirik
       const response = await axios.get(URL);
-      console.log(`Self-ping sent to ${URL}. Status: ${response.status}`);
+      console.log(`Self-ping successful. Status: ${response.status}`);
     } catch (error) {
       console.error(`Self-ping failed: ${error.message}`);
     }
