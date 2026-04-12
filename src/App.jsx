@@ -39,9 +39,9 @@ const Home = () => {
   };
 
   const projects = [
+    { title: "agshin.xyz", description: "A high-performance personal platform focused on minimalist design and seamless user experience. Features a custom-built backend architecture to handle real-time communications and automated service monitoring.", stack: ["React", "Node.js", "Express", "MongoDB"], type: "Portfolio" },
     { title: "Todo App", description: "A simple yet functional task management app built with React, showcasing core frontend skills like state management, component structure, and interactive UI design.", stack: ["React", "JavaScript", "CSS"], type: "Frontend Project" },
     { title: "Library Book Tracking System", description: "Built a modular console-based library management system using ADT principles. Implemented book add/remove/search, borrow-return flow, sorting, and Big-O complexity analysis.", stack: ["C", "Algorithm Analysis", "Data Structures"], type: "University Project" },
-    { title: "Tourism Website Idea", description: "A concept platform for helping tourists explore Azerbaijan. Focuses on user journey mapping and minimalist UI design", stack: ["UI/UX", "Frontend", "Planning"], type: "Concept Project" },
   ];
 
   const techStack = ["JavaScript", "React", "Node.js", "Express", "MongoDB", "Git", "Vite"];
