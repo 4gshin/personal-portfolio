@@ -182,4 +182,12 @@
     border-right-color: var(--border);
   }
 }
+.social-link {
+  transition: opacity 0.3s ease, color 0.3s ease;
+  font-weight: 500;
+}
 
+.social-link:hover {
+  opacity: 0.7;
+  color: #10b981; /* Sənin brend rəngin və ya istədiyin bir rəng */
+}

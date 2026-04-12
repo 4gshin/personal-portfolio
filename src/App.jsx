@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+
 
 const getApiUrl = () => {
   return import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 };
 
+// --- HOME KOMPONENTİ ---
 const Home = () => {
   const [formData, setFormData] = useState({ name: '', email: '', text: '' });
-  const API_BASE = getApiUrl(); 
+  const API_BASE = getApiUrl();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,17 +23,19 @@ const Home = () => {
         credentials: 'include'
       });
       const data = await response.json();
+      
       if (response.ok) {
-        alert("Message sent successfully!");
+        toast.success("Message sent successfully!", {
+          duration: 4000,
+          style: { background: '#18181b', color: '#fff', border: '1px solid #27272a' }
+        });
         setFormData({ name: '', email: '', text: '' });
       } else {
-        alert(data.error || "An error occurred");
+        toast.error(data.error || "Failed to send message.");
       }
     } catch (error) {
-      alert("Server connection failed!");
+      toast.error("Server connection error!");
     }
-
-    
   };
 
   const projects = [
@@ -44,31 +49,142 @@ const Home = () => {
 
   return (
     <div className="page-shell">
-      <header className="site-header"><div className="container nav-row"><div className="brand">AGSHIN</div><nav className="nav-links"><a href="#projects">Projects</a><a href="#about">About</a><a href="#contact">Contact</a></nav></div></header>
+      <header className="site-header">
+        <div className="container nav-row">
+          <div className="brand">AGSHIN</div>
+          <nav className="nav-links">
+            <a href="#projects">Projects</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+          </nav>
+        </div>
+      </header>
+      
       <main>
-        <section className="hero-section"><motion.div className="container hero-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}><div className="hero-badge">Software Engineering Student</div><h1 className="hero-title">Agshin Heybatli</h1><p className="hero-text">Building scalable and modern web applications.</p><div className="hero-actions"><a href="#projects" className="btn btn-primary">View Projects</a><a href="#contact" className="btn btn-secondary">Contact Me</a></div></motion.div></section>
-        <section id="projects" className="section-block"><div className="container"><motion.div className="section-heading" {...fadeInUp}><p className="section-kicker">Selected Work</p><h2>Featured Projects</h2></motion.div><div className="projects-grid">{projects.map((p, i) => (<motion.div key={i} className="project-card" {...fadeInUp} transition={{ delay: i * 0.1 }}><div className="card-content"><span className="project-type">{p.type}</span><h3>{p.title}</h3><p>{p.description}</p><div className="project-stack">{p.stack.map((s, j) => <span key={j} className="mini-pill">{s}</span>)}</div></div></motion.div>))}</div></div></section>
-        <section id="about" className="section-block about-section"><div className="container about-container-lg"><motion.div className="about-text-side" {...fadeInUp}><p className="section-kicker">About Me</p><h2 className="about-title-lg">Driven by design, guided by code.</h2><div className="about-description-lg"><p>I’m a Software Engineering student who enjoys building things that feel both clean and meaningful.Building things that feel clean, meaningful, and easy to use.
-Focused on structure, detail, and creating experiences that actually make sense.
-</p><p>Building. Learning. Improving.</p></div><div className="stack-wrap-lg">{techStack.map((s, i) => <span key={i} className="stack-pill-lg">{s}</span>)}</div></motion.div></div></section>
-        <section id="contact" className="section-block contact-section"><div className="container"><div className="contact-grid"><div className="contact-form-side"><p className="section-kicker">Contact</p><h2 className="contact-h2">Let’s connect.</h2><form className="contact-form" onSubmit={handleSubmit}><div className="input-row"><div className="input-group"><label>Full Name</label><input type="text" placeholder="Agshin Heybatli" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required /></div><div className="input-group"><label>Email Address</label><input type="email" placeholder="example@email.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required /></div></div><div className="input-group"><label>Message</label><textarea placeholder="How can I help you?" rows="6" value={formData.text} onChange={(e) => setFormData({...formData, text: e.target.value})} required></textarea></div><button type="submit" className="btn btn-primary send-btn">Send Message</button></form></div><div className="contact-info-side"><div className="info-block"><span className="info-label">Email</span><a href="mailto:contact@agshin.xyz" className="info-value">contact@agshin.xyz</a></div><div className="info-block"><span className="info-label">Location</span><p className="info-value">Ankara, Turkey</p></div></div></div></div></section>
+        <section className="hero-section">
+          <motion.div className="container hero-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="hero-badge">Software Engineering Student</div>
+            <h1 className="hero-title">Agshin Heybatli</h1>
+            <p className="hero-text">Building scalable and modern web applications.</p>
+            <div className="hero-actions">
+              <a href="#projects" className="btn btn-primary">View Projects</a>
+              <a href="#contact" className="btn btn-secondary">Contact Me</a>
+            </div>
+          </motion.div>
+        </section>
+
+        <section id="projects" className="section-block">
+          <div className="container">
+            <motion.div className="section-heading" {...fadeInUp}>
+              <p className="section-kicker">Selected Work</p>
+              <h2>Featured Projects</h2>
+            </motion.div>
+            <div className="projects-grid">
+              {projects.map((p, i) => (
+                <motion.div key={i} className="project-card" {...fadeInUp} transition={{ delay: i * 0.1 }}>
+                  <div className="card-content">
+                    <span className="project-type">{p.type}</span>
+                    <h3>{p.title}</h3>
+                    <p>{p.description}</p>
+                    <div className="project-stack">{p.stack.map((s, j) => <span key={j} className="mini-pill">{s}</span>)}</div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="about" className="section-block about-section">
+          <div className="container about-container-lg">
+            <motion.div className="about-text-side" {...fadeInUp}>
+              <p className="section-kicker">About Me</p>
+              <h2 className="about-title-lg">Driven by design, guided by code.</h2>
+              <div className="about-description-lg">
+                <p>I’m a Software Engineering student who enjoys building things that feel both clean and meaningful. Focused on structure, detail, and creating experiences that actually make sense.</p>
+                <p>Building. Learning. Improving.</p>
+              </div>
+              <div className="stack-wrap-lg">{techStack.map((s, i) => <span key={i} className="stack-pill-lg">{s}</span>)}</div>
+            </motion.div>
+          </div>
+        </section>
+
+        <section id="contact" className="section-block contact-section">
+          <div className="container">
+            <div className="contact-grid">
+              <div className="contact-form-side">
+                <p className="section-kicker">Contact</p>
+                <h2 className="contact-h2">Let’s connect.</h2>
+                <form className="contact-form" onSubmit={handleSubmit}>
+                  <div className="input-row">
+                    <div className="input-group">
+                      <label>Full Name</label>
+                      <input type="text" placeholder="Agshin Heybatli" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
+                    </div>
+                    <div className="input-group">
+                      <label>Email Address</label>
+                      <input type="email" placeholder="example@email.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+                    </div>
+                  </div>
+                  <div className="input-group">
+                    <label>Message</label>
+                    <textarea placeholder="How can I help you?" rows="6" value={formData.text} onChange={(e) => setFormData({...formData, text: e.target.value})} required></textarea>
+                  </div>
+                  <button type="submit" className="btn btn-primary send-btn">Send Message</button>
+                </form>
+              </div>
+              
+              <div className="contact-info-side">
+                <div className="info-block">
+                  <span className="info-label">Email</span>
+                  <a href="mailto:contact@agshin.xyz" className="info-value">contact@agshin.xyz</a>
+                </div>
+                <div className="info-block">
+                  <span className="info-label">Location</span>
+                  <p className="info-value">Ankara, Turkey</p>
+                </div>
+                <div className="info-block">
+                  <span className="info-label">Socials</span>
+                  <div className="social-links" style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
+                    {/* GitHub SVG */}
+      <a href="https://github.com/4gshin" target="_blank" rel="noopener noreferrer" title="GitHub">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: '0.3s' }} onMouseOver={e => e.currentTarget.style.stroke = '#fff'} onMouseOut={e => e.currentTarget.style.stroke = '#a1a1aa'}>
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </svg>
+      </a>
+
+      {/* LinkedIn SVG */}
+      <a href="https://linkedin.com/in/4gshin" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: '0.3s' }} onMouseOver={e => e.currentTarget.style.stroke = '#fff'} onMouseOut={e => e.currentTarget.style.stroke = '#a1a1aa'}>
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+          <rect x="2" y="9" width="4" height="12"></rect>
+          <circle cx="4" cy="4" r="2"></circle>
+        </svg>
+      </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
+
       <footer className="site-footer">
-  <div className="container footer-content">
-    <div className="footer-line"></div>
-    <div className="footer-bottom">
-      <p className="copyright">© 2026 — Agshin Heybatli</p>
-      <div className="footer-status">
-        <span className="status-dot"></span>
-        Available for new projects
-      </div>
-    </div>
-  </div>
-</footer>
+        <div className="container footer-content">
+          <div className="footer-line"></div>
+          <div className="footer-bottom">
+            <p className="copyright">© 2026 — Agshin Heybatli</p>
+            <div className="footer-status">
+              <span className="status-dot"></span>
+              Available for new projects
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
 
+// --- ADMIN KOMPONENTİ ---
 const Admin = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -106,20 +222,28 @@ const Admin = () => {
       credentials: 'include'
     });
     const data = await res.json();
-    if (data.success) { setIsAuthenticated(true); fetchMessages(); }
-    else alert(data.message || "Entry denied!");
+    if (data.success) { 
+      setIsAuthenticated(true); 
+      fetchMessages(); 
+      toast.success("Welcome back, Agshin!");
+    }
+    else toast.error(data.message || "Entry denied!");
   };
 
   const handleLogout = async () => {
     await fetch(`${API_BASE}/admin/logout`, { method: 'POST', credentials: 'include' });
     setIsAuthenticated(false);
     setMessages([]);
+    toast.success("Logged out successfully");
   };
 
   const deleteMsg = async (id) => {
     if(window.confirm("Are you sure you want to delete this message?")) {
       const res = await fetch(`${API_BASE}/messages/${id}`, { method: 'DELETE', credentials: 'include' });
-      if (res.ok) fetchMessages();
+      if (res.ok) {
+        toast.success("Message deleted");
+        fetchMessages();
+      }
     }
   };
 
@@ -167,4 +291,15 @@ const Admin = () => {
   );
 };
 
-export default function App() { return (<BrowserRouter><Routes><Route path="/" element={<Home />} /><Route path="/admin" element={<Admin />} /></Routes></BrowserRouter>); }
+// --- ƏSAS APP ---
+export default function App() { 
+  return (
+    <BrowserRouter>
+      <Toaster position="bottom-left" reverseOrder={false} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </BrowserRouter>
+  ); 
+}
