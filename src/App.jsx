@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/react';
 
 
 const getApiUrl = () => {
@@ -300,6 +301,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
+      <Analytics />
     </BrowserRouter>
   ); 
 }
