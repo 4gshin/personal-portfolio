@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import Joi from 'joi'; 
 import Message from './models/Message.js';
 import axios from 'axios'; 
+import { Analytics } from "@vercel/analytics/next"
 
 
 dotenv.config();

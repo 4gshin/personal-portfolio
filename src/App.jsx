@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import { Analytics } from "@vercel/analytics/next"
 
 
 const getApiUrl = () => {
@@ -252,7 +253,8 @@ const Admin = () => {
   if (!isAuthenticated) {
     return (
       <div style={{ background: '#09090b', minHeight: '100vh', display: 'flex', flexDirection: 'column', color: 'white' }}>
-        <header style={{ padding: '30px 50px' }}><div style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '4px' }}>A G S H I N</div></header>
+        <header style={{ padding: '30px 50px' }}><div style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '4px' }}>          <div className="brand">AGSHIN</div>
+</div></header>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <form onSubmit={handleLogin} style={{ background: '#18181b', padding: '40px', borderRadius: '16px', border: '1px solid #27272a', width: '350px' }}>
             <h2 style={{ marginBottom: '30px', textAlign: 'center' }}>Admin Access</h2>
