@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import { Analytics } from "@vercel/analytics/next"
-
+import { Analytics } from "@vercel/analytics/react";import './App.css';
 
 const getApiUrl = () => {
   return import.meta.env.VITE_API_URL || "http://localhost:5001/api";
@@ -46,7 +45,12 @@ const Home = () => {
   ];
 
   const techStack = ["JavaScript", "React", "Node.js", "Express", "MongoDB", "Git", "Vite"];
-  const fadeInUp = { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.6 } };
+  const fadeInUp = { 
+    initial: { opacity: 0, y: 30 }, 
+    whileInView: { opacity: 1, y: 0 }, 
+    viewport: { once: true }, 
+    transition: { duration: 0.6 } 
+  };
 
   return (
     <div className="page-shell">
@@ -68,8 +72,8 @@ const Home = () => {
             <h1 className="hero-title">Agshin Heybatli</h1>
             <p className="hero-text">Building scalable and modern web applications.</p>
             <div className="hero-actions">
-              <a href="#projects" className="btn btn-primary">View Projects</a>
-              <a href="#contact" className="btn btn-secondary">Contact Me</a>
+              <motion.a href="#projects" className="btn btn-primary" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>View Projects</motion.a>
+              <motion.a href="#contact" className="btn btn-secondary" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Contact Me</motion.a>
             </div>
           </motion.div>
         </section>
@@ -82,12 +86,22 @@ const Home = () => {
             </motion.div>
             <div className="projects-grid">
               {projects.map((p, i) => (
-                <motion.div key={i} className="project-card" {...fadeInUp} transition={{ delay: i * 0.1 }}>
+                <motion.div 
+                  key={i} 
+                  className="project-card" 
+                  {...fadeInUp} 
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ y: -10, transition: { duration: 0.2 } }}
+                >
                   <div className="card-content">
                     <span className="project-type">{p.type}</span>
                     <h3>{p.title}</h3>
                     <p>{p.description}</p>
-                    <div className="project-stack">{p.stack.map((s, j) => <span key={j} className="mini-pill">{s}</span>)}</div>
+                    <div className="project-stack">
+                      {p.stack.map((s, j) => (
+                        <span key={j} className="mini-pill">{s}</span>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -104,7 +118,18 @@ const Home = () => {
                 <p>I’m a Software Engineering student who enjoys building things that feel both clean and meaningful. Focused on structure, detail, and creating experiences that actually make sense.</p>
                 <p>Building. Learning. Improving.</p>
               </div>
-              <div className="stack-wrap-lg">{techStack.map((s, i) => <span key={i} className="stack-pill-lg">{s}</span>)}</div>
+              <div className="stack-wrap-lg">
+                {techStack.map((s, i) => (
+                  <motion.span 
+                    key={i} 
+                    className="stack-pill-lg"
+                    whileHover={{ scale: 1.1, backgroundColor: "#fff", color: "#000" }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    {s}
+                  </motion.span>
+                ))}
+              </div>
             </motion.div>
           </div>
         </section>
@@ -130,7 +155,14 @@ const Home = () => {
                     <label>Message</label>
                     <textarea placeholder="How can I help you?" rows="6" value={formData.text} onChange={(e) => setFormData({...formData, text: e.target.value})} required></textarea>
                   </div>
-                  <button type="submit" className="btn btn-primary send-btn">Send Message</button>
+                  <motion.button 
+                    type="submit" 
+                    className="btn btn-primary send-btn"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Send Message
+                  </motion.button>
                 </form>
               </div>
               
@@ -146,21 +178,18 @@ const Home = () => {
                 <div className="info-block">
                   <span className="info-label">Socials</span>
                   <div className="social-links" style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
-                    {/* GitHub SVG */}
-      <a href="https://github.com/4gshin" target="_blank" rel="noopener noreferrer" title="GitHub">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: '0.3s' }} onMouseOver={e => e.currentTarget.style.stroke = '#fff'} onMouseOut={e => e.currentTarget.style.stroke = '#a1a1aa'}>
-          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-        </svg>
-      </a>
-
-      {/* LinkedIn SVG */}
-      <a href="https://linkedin.com/in/4gshin" target="_blank" rel="noopener noreferrer" title="LinkedIn">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: '0.3s' }} onMouseOver={e => e.currentTarget.style.stroke = '#fff'} onMouseOut={e => e.currentTarget.style.stroke = '#a1a1aa'}>
-          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-          <rect x="2" y="9" width="4" height="12"></rect>
-          <circle cx="4" cy="4" r="2"></circle>
-        </svg>
-      </a>
+                    <motion.a href="https://github.com/4gshin" target="_blank" rel="noopener noreferrer" whileHover={{ y: -3 }}>
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: '0.3s' }} onMouseOver={e => e.currentTarget.style.stroke = '#fff'} onMouseOut={e => e.currentTarget.style.stroke = '#a1a1aa'}>
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                      </svg>
+                    </motion.a>
+                    <motion.a href="https://linkedin.com/in/4gshin" target="_blank" rel="noopener noreferrer" whileHover={{ y: -3 }}>
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: '0.3s' }} onMouseOver={e => e.currentTarget.style.stroke = '#fff'} onMouseOut={e => e.currentTarget.style.stroke = '#a1a1aa'}>
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                        <rect x="2" y="9" width="4" height="12"></rect>
+                        <circle cx="4" cy="4" r="2"></circle>
+                      </svg>
+                    </motion.a>
                   </div>
                 </div>
               </div>
@@ -186,6 +215,7 @@ const Home = () => {
 };
 
 // --- ADMIN KOMPONENTİ ---
+// (Dəyişmədi, amma struktur üçün saxlanıldı)
 const Admin = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -253,8 +283,7 @@ const Admin = () => {
   if (!isAuthenticated) {
     return (
       <div style={{ background: '#09090b', minHeight: '100vh', display: 'flex', flexDirection: 'column', color: 'white' }}>
-        <header style={{ padding: '30px 50px' }}><div style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '4px' }}>          <div className="brand">AGSHIN</div>
-</div></header>
+        <header style={{ padding: '30px 50px' }}><div className="brand">AGSHIN</div></header>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <form onSubmit={handleLogin} style={{ background: '#18181b', padding: '40px', borderRadius: '16px', border: '1px solid #27272a', width: '350px' }}>
             <h2 style={{ marginBottom: '30px', textAlign: 'center' }}>Admin Access</h2>
@@ -302,6 +331,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
+      <Analytics />
     </BrowserRouter>
   ); 
 }
