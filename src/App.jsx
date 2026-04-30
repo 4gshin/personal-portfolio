@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import { Analytics } from "@vercel/analytics/react";import './App.css';
+import { Analytics } from "@vercel/analytics/react";
+import './App.css';
 
 const getApiUrl = () => {
   return import.meta.env.VITE_API_URL || "http://localhost:5001/api";
@@ -11,7 +12,23 @@ const getApiUrl = () => {
 // --- HOME KOMPONENTİ ---
 const Home = () => {
   const [formData, setFormData] = useState({ name: '', email: '', text: '' });
+  const [dbProjects, setDbProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
   const API_BASE = getApiUrl();
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/projects`);
+      const data = await res.json();
+      if (Array.isArray(data)) setDbProjects(data);
+    } catch (err) {
+      console.error("Failed to fetch projects");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,27 +39,16 @@ const Home = () => {
         body: JSON.stringify(formData),
         credentials: 'include'
       });
-      const data = await response.json();
-      
       if (response.ok) {
         toast.success("Message sent successfully!", {
-          duration: 4000,
           style: { background: '#18181b', color: '#fff', border: '1px solid #27272a' }
         });
         setFormData({ name: '', email: '', text: '' });
-      } else {
-        toast.error(data.error || "Failed to send message.");
       }
     } catch (error) {
       toast.error("Server connection error!");
     }
   };
-
-  const projects = [
-    { title: "agshin.xyz", description: "A high-performance personal platform focused on minimalist design and seamless user experience. Features a custom-built backend architecture to handle real-time communications and automated service monitoring.", stack: ["React", "Node.js", "Express", "MongoDB"], type: "Portfolio" },
-    { title: "Todo App", description: "A simple yet functional task management app built with React, showcasing core frontend skills like state management, component structure, and interactive UI design.", stack: ["React", "JavaScript", "CSS"], type: "Frontend Project" },
-    { title: "Library Book Tracking System", description: "Built a modular console-based library management system using ADT principles. Implemented book add/remove/search, borrow-return flow, sorting, and Big-O complexity analysis.", stack: ["C", "Algorithm Analysis", "Data Structures"], type: "University Project" },
-  ];
 
   const techStack = ["JavaScript", "React", "Node.js", "Express", "MongoDB", "Git", "Vite"];
   const fadeInUp = { 
@@ -85,20 +91,22 @@ const Home = () => {
               <h2>Featured Projects</h2>
             </motion.div>
             <div className="projects-grid">
-              {projects.map((p, i) => (
+              {dbProjects.map((p, i) => (
                 <motion.div 
-                  key={i} 
+                  key={p._id || i} 
                   className="project-card" 
                   {...fadeInUp} 
                   transition={{ delay: i * 0.1 }}
-                  whileHover={{ y: -10, transition: { duration: 0.2 } }}
+                  whileHover={{ y: -10 }}
+                  onClick={() => setSelectedProject(p)}
+                  style={{ cursor: 'pointer' }}
                 >
                   <div className="card-content">
                     <span className="project-type">{p.type}</span>
                     <h3>{p.title}</h3>
                     <p>{p.description}</p>
                     <div className="project-stack">
-                      {p.stack.map((s, j) => (
+                      {p.stack?.map((s, j) => (
                         <span key={j} className="mini-pill">{s}</span>
                       ))}
                     </div>
@@ -109,13 +117,49 @@ const Home = () => {
           </div>
         </section>
 
+        {/* Modal for Project Details */}
+        <AnimatePresence>
+          {selectedProject && (
+            <div className="modal-overlay" onClick={() => setSelectedProject(null)}>
+              <motion.div 
+                className="modal-content"
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button className="close-modal" onClick={() => setSelectedProject(null)}>×</button>
+                <span className="project-type">{selectedProject.type}</span>
+                <h2>{selectedProject.title}</h2>
+                <div className="modal-body">
+                  <p>{selectedProject.detailedDescription || selectedProject.description}</p>
+                  <div className="project-stack" style={{ marginTop: '20px' }}>
+                    {selectedProject.stack?.map((s, j) => (
+                      <span key={j} className="mini-pill">{s}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  {selectedProject.githubLink && (
+                    <a href={selectedProject.githubLink} target="_blank" rel="noreferrer" className="btn btn-secondary">GitHub</a>
+                  )}
+                  {selectedProject.liveLink && (
+                    <a href={selectedProject.liveLink} target="_blank" rel="noreferrer" className="btn btn-primary">Live Demo</a>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* About Section ... eyni qaldı */}
         <section id="about" className="section-block about-section">
           <div className="container about-container-lg">
             <motion.div className="about-text-side" {...fadeInUp}>
               <p className="section-kicker">About Me</p>
               <h2 className="about-title-lg">Driven by design, guided by code.</h2>
               <div className="about-description-lg">
-                <p>I’m a Software Engineering student who enjoys building things that feel both clean and meaningful. Focused on structure, detail, and creating experiences that actually make sense.</p>
+                <p>I’m a Software Engineering student who enjoys building things that feel both clean and meaningful.</p>
                 <p>Building. Learning. Improving.</p>
               </div>
               <div className="stack-wrap-lg">
@@ -124,7 +168,6 @@ const Home = () => {
                     key={i} 
                     className="stack-pill-lg"
                     whileHover={{ scale: 1.1, backgroundColor: "#fff", color: "#000" }}
-                    transition={{ type: "spring", stiffness: 300 }}
                   >
                     {s}
                   </motion.span>
@@ -155,17 +198,12 @@ const Home = () => {
                     <label>Message</label>
                     <textarea placeholder="How can I help you?" rows="6" value={formData.text} onChange={(e) => setFormData({...formData, text: e.target.value})} required></textarea>
                   </div>
-                  <motion.button 
-                    type="submit" 
-                    className="btn btn-primary send-btn"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
+                  <motion.button type="submit" className="btn btn-primary send-btn" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     Send Message
                   </motion.button>
                 </form>
               </div>
-              
+              {/* Contact Info ... eyni qaldı */}
               <div className="contact-info-side">
                 <div className="info-block">
                   <span className="info-label">Email</span>
@@ -179,16 +217,10 @@ const Home = () => {
                   <span className="info-label">Socials</span>
                   <div className="social-links" style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
                     <motion.a href="https://github.com/4gshin" target="_blank" rel="noopener noreferrer" whileHover={{ y: -3 }}>
-                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: '0.3s' }} onMouseOver={e => e.currentTarget.style.stroke = '#fff'} onMouseOut={e => e.currentTarget.style.stroke = '#a1a1aa'}>
-                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                      </svg>
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
                     </motion.a>
                     <motion.a href="https://linkedin.com/in/4gshin" target="_blank" rel="noopener noreferrer" whileHover={{ y: -3 }}>
-                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: '0.3s' }} onMouseOver={e => e.currentTarget.style.stroke = '#fff'} onMouseOut={e => e.currentTarget.style.stroke = '#a1a1aa'}>
-                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                        <rect x="2" y="9" width="4" height="12"></rect>
-                        <circle cx="4" cy="4" r="2"></circle>
-                      </svg>
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
                     </motion.a>
                   </div>
                 </div>
@@ -215,33 +247,68 @@ const Home = () => {
 };
 
 // --- ADMIN KOMPONENTİ ---
-// (Dəyişmədi, amma struktur üçün saxlanıldı)
 const Admin = () => {
   const [messages, setMessages] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
+  const [newProject, setNewProject] = useState({
+    title: '', description: '', detailedDescription: '', stack: '', type: '', githubLink: '', liveLink: ''
+  });
+  
   const API_BASE = getApiUrl();
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch (`${API_BASE}/admin/check`, { credentials: 'include' });
-        if (res.ok) {
-          setIsAuthenticated(true);
-          fetchMessages();
-        }
-      } catch (err) { console.log("No session"); }
-      finally { setLoading(false); }
-    };
     checkSession();
   }, []);
 
-  const fetchMessages = async () => {
-    const res = await fetch(`${API_BASE}/messages`, { credentials: 'include' });
-    if (res.status === 401) { setIsAuthenticated(false); return; }
-    const data = await res.json();
-    if (Array.isArray(data)) setMessages(data);
+  const checkSession = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/admin/check`, { credentials: 'include' });
+      if (res.ok) {
+        setIsAuthenticated(true);
+        fetchData();
+      }
+    } catch (err) { console.log("No session"); }
+    finally { setLoading(false); }
+  };
+
+  const fetchData = async () => {
+    const [msgRes, projRes] = await Promise.all([
+      fetch(`${API_BASE}/messages`, { credentials: 'include' }),
+      fetch(`${API_BASE}/projects`)
+    ]);
+    const msgData = await msgRes.json();
+    const projData = await projRes.json();
+    if (Array.isArray(msgData)) setMessages(msgData);
+    if (Array.isArray(projData)) setProjects(projData);
+  };
+
+  const handleAddProject = async (e) => {
+    e.preventDefault();
+    const projectData = {
+      ...newProject,
+      stack: newProject.stack.split(',').map(s => s.trim())
+    };
+    const res = await fetch(`${API_BASE}/projects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(projectData),
+      credentials: 'include'
+    });
+    if (res.ok) {
+      toast.success("Project added!");
+      setNewProject({ title: '', description: '', detailedDescription: '', stack: '', type: '', githubLink: '', liveLink: '' });
+      fetchData();
+    }
+  };
+
+  const deleteProject = async (id) => {
+    if(window.confirm("Delete project?")) {
+      await fetch(`${API_BASE}/projects/${id}`, { method: 'DELETE', credentials: 'include' });
+      fetchData();
+    }
   };
 
   const handleLogin = async (e) => {
@@ -252,81 +319,92 @@ const Admin = () => {
       body: JSON.stringify(loginData),
       credentials: 'include'
     });
-    const data = await res.json();
-    if (data.success) { 
+    if ((await res.json()).success) { 
       setIsAuthenticated(true); 
-      fetchMessages(); 
-      toast.success("Welcome back, Agshin!");
+      fetchData(); 
     }
-    else toast.error(data.message || "Entry denied!");
   };
 
   const handleLogout = async () => {
     await fetch(`${API_BASE}/admin/logout`, { method: 'POST', credentials: 'include' });
     setIsAuthenticated(false);
-    setMessages([]);
-    toast.success("Logged out successfully");
   };
 
-  const deleteMsg = async (id) => {
-    if(window.confirm("Are you sure you want to delete this message?")) {
-      const res = await fetch(`${API_BASE}/messages/${id}`, { method: 'DELETE', credentials: 'include' });
-      if (res.ok) {
-        toast.success("Message deleted");
-        fetchMessages();
-      }
-    }
-  };
-
-  if (loading) return <div style={{background:'#09090b', color:'white', height:'100vh', display:'flex', alignItems:'center', justifyContent:'center'}}>Loading...</div>;
+  if (loading) return <div className="admin-loading">Loading...</div>;
 
   if (!isAuthenticated) {
     return (
-      <div style={{ background: '#09090b', minHeight: '100vh', display: 'flex', flexDirection: 'column', color: 'white' }}>
-        <header style={{ padding: '30px 50px' }}><div className="brand">AGSHIN</div></header>
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <form onSubmit={handleLogin} style={{ background: '#18181b', padding: '40px', borderRadius: '16px', border: '1px solid #27272a', width: '350px' }}>
-            <h2 style={{ marginBottom: '30px', textAlign: 'center' }}>Admin Access</h2>
-            <input type="text" placeholder="Username" value={loginData.username} onChange={(e) => setLoginData({...loginData, username: e.target.value})} style={{ background: '#09090b', border: '1px solid #27272a', color: 'white', padding: '12px', borderRadius: '8px', width: '100%', marginBottom: '20px', outline: 'none' }} required />
-            <input type="password" placeholder="Password" value={loginData.password} onChange={(e) => setLoginData({...loginData, password: e.target.value})} style={{ background: '#09090b', border: '1px solid #27272a', color: 'white', padding: '12px', borderRadius: '8px', width: '100%', marginBottom: '30px', outline: 'none' }} required />
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Login</button>
-          </form>
-        </div>
+      <div className="admin-login-page">
+        <form onSubmit={handleLogin} className="admin-login-form">
+          <h2>Admin Access</h2>
+          <input type="text" placeholder="Username" value={loginData.username} onChange={e => setLoginData({...loginData, username: e.target.value})} />
+          <input type="password" placeholder="Password" value={loginData.password} onChange={e => setLoginData({...loginData, password: e.target.value})} />
+          <button type="submit" className="btn btn-primary">Login</button>
+        </form>
       </div>
     );
   }
 
   return (
-    <div style={{ background: '#09090b', minHeight: '100vh', color: '#fff', padding: '0 0 60px 0' }}>
-      <header style={{ padding: '30px 50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #18181b' }}>
-        <div style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '4px' }}>A G S H I N</div>
-        <button onClick={handleLogout} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: '500' }}>Logout</button>
+    <div className="admin-dashboard">
+      <header className="admin-header">
+        <h1>Dashboard</h1>
+        <button onClick={handleLogout} className="logout-btn">Logout</button>
       </header>
-      <div className="container" style={{ marginTop: '40px', padding: '0 50px' }}>
-        <h2 style={{ marginBottom: '30px' }}>Dashboard</h2>
-        <div style={{ display: 'grid', gap: '20px' }}>
-          {messages.length > 0 ? messages.map((m) => (
-            <div key={m._id} style={{ background: '#18181b', border: '1px solid #27272a', padding: '24px', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <h3 style={{ margin: '0 0 8px 0' }}>{m.name}</h3>
-                <p style={{ color: '#a1a1aa', fontSize: '14px' }}>{m.email}</p>
-                <p style={{ color: '#e4e4e7', marginTop: '15px', whiteSpace: 'pre-wrap' }}>{m.text}</p>
-                <p style={{ color: '#71717a', fontSize: '12px', marginTop: '10px' }}>{new Date(m.createdAt).toLocaleString()}</p>
-              </div>
-              <button onClick={() => deleteMsg(m._id)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' }}>Delete</button>
+
+      <div className="container admin-container">
+        {/* Project Management Section */}
+        <section className="admin-section">
+          <h2>Manage Projects</h2>
+          <form onSubmit={handleAddProject} className="project-form">
+            <input type="text" placeholder="Title" value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} required />
+            <input type="text" placeholder="Type (e.g. Portfolio)" value={newProject.type} onChange={e => setNewProject({...newProject, type: e.target.value})} />
+            <textarea placeholder="Short Description" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} required />
+            <textarea placeholder="Detailed Description" value={newProject.detailedDescription} onChange={e => setNewProject({...newProject, detailedDescription: e.target.value})} />
+            <input type="text" placeholder="Stack (comma separated)" value={newProject.stack} onChange={e => setNewProject({...newProject, stack: e.target.value})} />
+            <div className="input-row">
+              <input type="text" placeholder="GitHub Link" value={newProject.githubLink} onChange={e => setNewProject({...newProject, githubLink: e.target.value})} />
+              <input type="text" placeholder="Live Link" value={newProject.liveLink} onChange={e => setNewProject({...newProject, liveLink: e.target.value})} />
             </div>
-          )) : <p>No messages yet..</p>}
-        </div>
+            <button type="submit" className="btn btn-primary">Add Project</button>
+          </form>
+
+          <div className="admin-list">
+            {projects.map(p => (
+              <div key={p._id} className="admin-item">
+                <span>{p.title}</span>
+                <button onClick={() => deleteProject(p._id)} className="delete-btn">Delete</button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Message Management Section */}
+        <section className="admin-section">
+          <h2>Messages</h2>
+          <div className="admin-list">
+            {messages.map(m => (
+              <div key={m._id} className="admin-message-card">
+                <h3>{m.name} <span>({m.email})</span></h3>
+                <p>{m.text}</p>
+                <button onClick={() => {
+                   if(window.confirm("Delete msg?")) {
+                     fetch(`${API_BASE}/messages/${m._id}`, { method: 'DELETE', credentials: 'include' }).then(() => fetchData());
+                   }
+                }} className="delete-btn">Delete</button>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
 };
 
-// --- ƏSAS APP ---
 export default function App() { 
   return (
     <BrowserRouter>
-      <Toaster position="bottom-left" reverseOrder={false} />
+      <Toaster position="bottom-left" />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
