@@ -39,9 +39,8 @@ app.use(cors({
 const limiterHelper = (windowMs, max, message) => rateLimit({
   windowMs,
   max,
-  keyGenerator: (req) => {
-    return req.headers['x-forwarded-for']?.split(',')[0] || req.ip || req.socket.remoteAddress;
-  },
+  keyGenerator: (req) => req.headers['x-forwarded-for']?.split(',')[0] || req.ip,
+  validate: { xForwardedForHeader: false }, // Kitabxananın "həyəcan təbilini" söndürürük
   handler: (req, res) => res.status(429).json({ success: false, message })
 });
 
