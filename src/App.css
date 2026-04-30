@@ -203,6 +203,32 @@ body {
   padding: 40px; border-radius: 24px; max-width: 600px; width: 90%; position: relative;
 }
 
+.close-modal {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: transparent; 
+  border: none;
+  color: var(--text-dim);
+  font-size: 32px; 
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.close-modal:hover {
+  color: var(--primary);
+  background: rgba(255, 255, 255, 0.1); 
+  transform: rotate(90deg); 
+}
+
 .btn { 
   padding: 12px 24px; 
   border-radius: 12px; 

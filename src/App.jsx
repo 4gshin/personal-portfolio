@@ -331,7 +331,7 @@ const Admin = () => {
   return (
     <div className="admin-dashboard">
       <header className="admin-header">
-        <div className="brand">A G S H I N</div>
+        <div className="brand">agshin.xyz</div>
         <button onClick={handleLogout} className="logout-btn">Logout</button>
       </header>
       <div className="container admin-container">
