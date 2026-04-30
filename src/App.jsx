@@ -117,7 +117,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Modal for Project Details */}
         <AnimatePresence>
           {selectedProject && (
             <div className="modal-overlay" onClick={() => setSelectedProject(null)}>
@@ -152,14 +151,13 @@ const Home = () => {
           )}
         </AnimatePresence>
 
-        {/* About Section ... eyni qaldı */}
         <section id="about" className="section-block about-section">
           <div className="container about-container-lg">
             <motion.div className="about-text-side" {...fadeInUp}>
               <p className="section-kicker">About Me</p>
               <h2 className="about-title-lg">Driven by design, guided by code.</h2>
               <div className="about-description-lg">
-                <p>I’m a Software Engineering student who enjoys building things that feel both clean and meaningful.</p>
+                <p>I’m a Software Engineering student who enjoys building things that feel hem clean hem de mənalı.</p>
                 <p>Building. Learning. Improving.</p>
               </div>
               <div className="stack-wrap-lg">
@@ -203,7 +201,6 @@ const Home = () => {
                   </motion.button>
                 </form>
               </div>
-              {/* Contact Info ... eyni qaldı */}
               <div className="contact-info-side">
                 <div className="info-block">
                   <span className="info-label">Email</span>
@@ -253,8 +250,11 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
+  
+  // Tag sistemi üçün state-lər
+  const [currentTag, setCurrentTag] = useState("");
   const [newProject, setNewProject] = useState({
-    title: '', description: '', detailedDescription: '', stack: '', type: '', githubLink: '', liveLink: ''
+    title: '', description: '', detailedDescription: '', stack: [], type: '', githubLink: '', liveLink: ''
   });
   
   const API_BASE = getApiUrl();
@@ -285,21 +285,38 @@ const Admin = () => {
     if (Array.isArray(projData)) setProjects(projData);
   };
 
+  // Tag əlavə etmə funksiyası
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && currentTag.trim() !== "") {
+      e.preventDefault();
+      if (!newProject.stack.includes(currentTag.trim())) {
+        setNewProject({
+          ...newProject,
+          stack: [...newProject.stack, currentTag.trim()]
+        });
+      }
+      setCurrentTag("");
+    }
+  };
+
+  const removeTag = (indexToRemove) => {
+    setNewProject({
+      ...newProject,
+      stack: newProject.stack.filter((_, index) => index !== indexToRemove)
+    });
+  };
+
   const handleAddProject = async (e) => {
     e.preventDefault();
-    const projectData = {
-      ...newProject,
-      stack: newProject.stack.split(',').map(s => s.trim())
-    };
     const res = await fetch(`${API_BASE}/projects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(projectData),
+      body: JSON.stringify(newProject),
       credentials: 'include'
     });
     if (res.ok) {
       toast.success("Project added!");
-      setNewProject({ title: '', description: '', detailedDescription: '', stack: '', type: '', githubLink: '', liveLink: '' });
+      setNewProject({ title: '', description: '', detailedDescription: '', stack: [], type: '', githubLink: '', liveLink: '' });
       fetchData();
     }
   };
@@ -319,9 +336,12 @@ const Admin = () => {
       body: JSON.stringify(loginData),
       credentials: 'include'
     });
-    if ((await res.json()).success) { 
+    const data = await res.json();
+    if (data.success) { 
       setIsAuthenticated(true); 
       fetchData(); 
+    } else {
+      toast.error(data.message || "Invalid credentials");
     }
   };
 
@@ -337,8 +357,8 @@ const Admin = () => {
       <div className="admin-login-page">
         <form onSubmit={handleLogin} className="admin-login-form">
           <h2>Admin Access</h2>
-          <input type="text" placeholder="Username" value={loginData.username} onChange={e => setLoginData({...loginData, username: e.target.value})} />
-          <input type="password" placeholder="Password" value={loginData.password} onChange={e => setLoginData({...loginData, password: e.target.value})} />
+          <input type="text" placeholder="Username" value={loginData.username} onChange={e => setLoginData({...loginData, username: e.target.value})} required />
+          <input type="password" placeholder="Password" value={loginData.password} onChange={e => setLoginData({...loginData, password: e.target.value})} required />
           <button type="submit" className="btn btn-primary">Login</button>
         </form>
       </div>
@@ -348,12 +368,11 @@ const Admin = () => {
   return (
     <div className="admin-dashboard">
       <header className="admin-header">
-        <h1>Dashboard</h1>
+        <div className="brand">A G S H I N</div>
         <button onClick={handleLogout} className="logout-btn">Logout</button>
       </header>
 
       <div className="container admin-container">
-        {/* Project Management Section */}
         <section className="admin-section">
           <h2>Manage Projects</h2>
           <form onSubmit={handleAddProject} className="project-form">
@@ -361,7 +380,24 @@ const Admin = () => {
             <input type="text" placeholder="Type (e.g. Portfolio)" value={newProject.type} onChange={e => setNewProject({...newProject, type: e.target.value})} />
             <textarea placeholder="Short Description" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} required />
             <textarea placeholder="Detailed Description" value={newProject.detailedDescription} onChange={e => setNewProject({...newProject, detailedDescription: e.target.value})} />
-            <input type="text" placeholder="Stack (comma separated)" value={newProject.stack} onChange={e => setNewProject({...newProject, stack: e.target.value})} />
+            
+            {/* Tag Input Field */}
+            <div className="tags-input-container">
+              {newProject.stack.map((tag, index) => (
+                <div key={index} className="tag-item">
+                  {tag}
+                  <button type="button" onClick={() => removeTag(index)}>×</button>
+                </div>
+              ))}
+              <input 
+                type="text" 
+                placeholder="Press Enter to add stack" 
+                value={currentTag}
+                onChange={(e) => setCurrentTag(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+            </div>
+
             <div className="input-row">
               <input type="text" placeholder="GitHub Link" value={newProject.githubLink} onChange={e => setNewProject({...newProject, githubLink: e.target.value})} />
               <input type="text" placeholder="Live Link" value={newProject.liveLink} onChange={e => setNewProject({...newProject, liveLink: e.target.value})} />
@@ -379,21 +415,21 @@ const Admin = () => {
           </div>
         </section>
 
-        {/* Message Management Section */}
         <section className="admin-section">
           <h2>Messages</h2>
           <div className="admin-list">
-            {messages.map(m => (
+            {messages.length > 0 ? messages.map(m => (
               <div key={m._id} className="admin-message-card">
                 <h3>{m.name} <span>({m.email})</span></h3>
                 <p>{m.text}</p>
+                <p style={{color: '#71717a', fontSize: '12px'}}>{new Date(m.createdAt).toLocaleString()}</p>
                 <button onClick={() => {
                    if(window.confirm("Delete msg?")) {
                      fetch(`${API_BASE}/messages/${m._id}`, { method: 'DELETE', credentials: 'include' }).then(() => fetchData());
                    }
                 }} className="delete-btn">Delete</button>
               </div>
-            ))}
+            )) : <p>No messages yet.</p>}
           </div>
         </section>
       </div>
