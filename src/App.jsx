@@ -264,7 +264,6 @@ const Admin = () => {
     }
   };
 
-  // Redaktəni başlatma funksiyası - Linklərin dolmasını təmin etdik
   const startEdit = (p) => {
     setEditingId(p._id);
     setNewProject({
@@ -273,8 +272,8 @@ const Admin = () => {
       detailedDescription: p.detailedDescription || '',
       stack: p.stack || [],
       type: p.type || '',
-      githubLink: p.githubLink || '', // Linkləri bura əlavə etdik
-      liveLink: p.liveLink || ''      // Linkləri bura əlavə etdik
+      githubLink: p.githubLink || '',
+      liveLink: p.liveLink || ''
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -311,6 +310,11 @@ const Admin = () => {
     else toast.error("Denied");
   };
 
+  const handleLogout = async () => {
+    await fetch(`${API_BASE}/admin/logout`, { method: 'POST', credentials: 'include' });
+    setIsAuthenticated(false);
+  };
+
   if (loading) return <div className="admin-loading">Loading...</div>;
 
   if (!isAuthenticated) return (
@@ -328,7 +332,7 @@ const Admin = () => {
     <div className="admin-dashboard">
       <header className="admin-header">
         <div className="brand">A G S H I N</div>
-        <button onClick={() => { fetch(`${API_BASE}/admin/logout`, {method:'POST', credentials:'include'}); setIsAuthenticated(false); }} style={{background:'transparent', color:'#ef4444', border:'none', cursor:'pointer'}}>Logout</button>
+        <button onClick={handleLogout} className="logout-btn">Logout</button>
       </header>
       <div className="container admin-container">
         <section className="admin-section">
@@ -346,7 +350,6 @@ const Admin = () => {
               <input type="text" placeholder="Stack + Enter" value={currentTag} onChange={e => setCurrentTag(e.target.value)} onKeyDown={handleKeyDown} />
             </div>
 
-            {/* Linklərin Editlənməsi Hissəsi - onChange-ləri yoxladıq */}
             <div className="input-row" style={{display:'flex', gap:'10px'}}>
               <input 
                 type="text" 
@@ -394,8 +397,15 @@ const Admin = () => {
           <h2>Messages</h2>
           {messages.map(m => (
             <div key={m._id} className="admin-message-card" style={{background:'#18181b', padding:'20px', borderRadius:'10px', marginBottom:'10px'}}>
-              <h3>{m.name}</h3><p>{m.text}</p>
-              <button onClick={async () => { await fetch(`${API_BASE}/messages/${m._id}`, {method:'DELETE', credentials:'include'}); fetchData(); }} className="delete-btn">Delete</button>
+              <div className="message-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px'}}>
+                <h3>{m.name}</h3>
+                <span className="message-email" style={{color: '#10b981', fontSize: '14px', fontFamily: 'monospace'}}>{m.email}</span>
+              </div>
+              <p style={{color: '#e4e4e7', whiteSpace: 'pre-wrap'}}>{m.text}</p>
+              <div className="message-footer" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px'}}>
+                <span style={{color: '#71717a', fontSize: '12px'}}>{new Date(m.createdAt).toLocaleString()}</span>
+                <button onClick={async () => { if(window.confirm("Delete?")) { await fetch(`${API_BASE}/messages/${m._id}`, {method:'DELETE', credentials:'include'}); fetchData(); } }} className="delete-btn">Delete</button>
+              </div>
             </div>
           ))}
         </section>
