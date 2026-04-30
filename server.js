@@ -22,10 +22,7 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json({ limit: '10kb' })); 
 
-// 2. MONGO SANITIZE (NoSQL Injection qoruması)
-app.use(mongoSanitize());
-
-// 3. CORS WHITELIST
+// 2. CORS AYARLARI
 const allowedOrigins = ['http://localhost:5173', 'https://agshin.xyz']; 
 app.use(cors({
   origin: (origin, callback) => {
@@ -38,26 +35,27 @@ app.use(cors({
   credentials: true 
 }));
 
-// 4. RATE LIMITERS (Real IP Təyinatı ilə)
-// Proxy arxasında x-forwarded-for başlığını yoxlayırıq
+// 3. RATE LIMITERS (IPv6 Fix)
 const limiterHelper = (windowMs, max, message) => rateLimit({
   windowMs,
   max,
-  keyGenerator: (req) => req.headers['x-forwarded-for'] || req.ip,
+  keyGenerator: (req) => {
+    return req.headers['x-forwarded-for']?.split(',')[0] || req.ip || req.socket.remoteAddress;
+  },
   handler: (req, res) => res.status(429).json({ success: false, message })
 });
 
 const loginLimiter = limiterHelper(15 * 60 * 1000, 5, "Too many login attempts. Try again in 15 mins.");
 const contactLimiter = limiterHelper(60 * 60 * 1000, 3, "Spam protection: Only 3 messages per hour allowed.");
 
-// 5. VALIDATION SCHEMAS (Joi)
+// 4. VALIDATION SCHEMAS (Joi)
 const contactSchema = Joi.object({
   name: Joi.string().min(2).max(50).required().trim(),
   email: Joi.string().email().required().lowercase().trim(),
-  text: Joi.string().min(10).max(1000).required().trim() // Max 1000 simvol
+  text: Joi.string().min(10).max(1000).required().trim()
 });
 
-// 6. AUTH MIDDLEWARE
+// 5. AUTH MIDDLEWARE
 const protect = (req, res, next) => {
   const token = req.cookies.admin_token;
   if (!token) return res.status(401).json({ success: false, message: "Entry not allowed!" });
@@ -74,20 +72,21 @@ const protect = (req, res, next) => {
 
 // --- ROUTES ---
 
-// Admin Login
+// Admin Login 
 app.post('/api/admin/login', loginLimiter, async (req, res) => {
-  const { username, password } = req.body;
+  const sanitizedBody = mongoSanitize.sanitize(req.body);
+  const { username, password } = sanitizedBody;
+
   if (username === process.env.ADMIN_USER) {
     const isMatch = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
     if (isMatch) {
       const token = jwt.sign({ user: username }, process.env.JWT_SECRET, { expiresIn: '12h' });
       
-      // Təhlükəsiz Cookie tənzimləmələri
       res.cookie('admin_token', token, { 
         httpOnly: true, 
         secure: true, 
-        sameSite: 'Strict', // CSRF qoruması üçün
-        maxAge: 43200000 // 12 saat
+        sameSite: 'None', 
+        maxAge: 43200000 
       });
       return res.json({ success: true });
     }
@@ -96,7 +95,7 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
 });
 
 app.post('/api/admin/logout', (req, res) => {
-  res.clearCookie('admin_token', { httpOnly: true, secure: true, sameSite: 'Strict' });
+  res.clearCookie('admin_token', { httpOnly: true, secure: true, sameSite: 'None' });
   res.json({ success: true });
 });
 
@@ -121,7 +120,8 @@ app.delete('/api/messages/:id', protect, async (req, res) => {
 
 app.post('/api/contact', contactLimiter, async (req, res) => {
   try {
-    const { error, value } = contactSchema.validate(req.body);
+    const sanitizedBody = mongoSanitize.sanitize(req.body);
+    const { error, value } = contactSchema.validate(sanitizedBody);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     const newMessage = new Message(value);
