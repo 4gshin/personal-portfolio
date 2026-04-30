@@ -320,9 +320,9 @@ const Admin = () => {
   if (!isAuthenticated) return (
     <div className="admin-login-page">
       <form onSubmit={handleLogin} className="admin-login-form">
-        <h2>Admin Access</h2>
-        <input type="text" placeholder="User" value={loginData.username} onChange={e => setLoginData({...loginData, username: e.target.value})} required />
-        <input type="password" placeholder="Pass" value={loginData.password} onChange={e => setLoginData({...loginData, password: e.target.value})} required />
+        <h2>Admin Panel</h2>
+        <input type="text" placeholder="Username" value={loginData.username} onChange={e => setLoginData({...loginData, username: e.target.value})} required />
+        <input type="password" placeholder="Password" value={loginData.password} onChange={e => setLoginData({...loginData, password: e.target.value})} required />
         <button type="submit" className="btn btn-primary">Login</button>
       </form>
     </div>
