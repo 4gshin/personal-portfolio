@@ -22,17 +22,27 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json({ limit: '10kb' })); 
 
-// 2. CORS AYARLARI
-const allowedOrigins = ['http://localhost:5173', 'https://agshin.xyz']; 
+// 2. CORS AYARLARI (Tam Fix)
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:3000',
+  'https://agshin.xyz', 
+  'https://www.agshin.xyz'
+]; 
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    // origin yoxdursa (məs. Postman) və ya siyahıdadırsa icazə ver
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log("Blocked by CORS:", origin); // Hansı originin bloklandığını görmək üçün
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // 3. RATE LIMITERS (IPv6 Fix)
@@ -44,8 +54,8 @@ const limiterHelper = (windowMs, max, message) => rateLimit({
   handler: (req, res) => res.status(429).json({ success: false, message })
 });
 
-const loginLimiter = limiterHelper(15 * 60 * 1000, 5, "Too many login attempts. Try again in 15 mins.");
-const contactLimiter = limiterHelper(60 * 60 * 1000, 3, "Spam protection: Only 3 messages per hour allowed.");
+const loginLimiter = limiterHelper(15 * 60 * 1000, 10, "Too many login attempts."); // Test üçün limiti bir az artırdım
+const contactLimiter = limiterHelper(60 * 60 * 1000, 5, "Spam protection active.");
 
 // 4. VALIDATION SCHEMAS (Joi)
 const contactSchema = Joi.object({
@@ -64,7 +74,11 @@ const protect = (req, res, next) => {
     req.admin = decoded;
     next();
   } catch (err) {
-    res.clearCookie('admin_token');
+    res.clearCookie('admin_token', { 
+      httpOnly: true, 
+      secure: true, 
+      sameSite: 'None' 
+    });
     res.status(401).json({ success: false, message: "Session expired!" });
   }
 };
@@ -81,11 +95,12 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
     if (isMatch) {
       const token = jwt.sign({ user: username }, process.env.JWT_SECRET, { expiresIn: '12h' });
       
+      // Render-də kuki üçün mütləq Secure və SameSite None olmalıdır
       res.cookie('admin_token', token, { 
         httpOnly: true, 
         secure: true, 
         sameSite: 'None', 
-        maxAge: 43200000 
+        maxAge: 12 * 60 * 60 * 1000 // 12 saat
       });
       return res.json({ success: true });
     }
@@ -94,7 +109,11 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
 });
 
 app.post('/api/admin/logout', (req, res) => {
-  res.clearCookie('admin_token', { httpOnly: true, secure: true, sameSite: 'None' });
+  res.clearCookie('admin_token', { 
+    httpOnly: true, 
+    secure: true, 
+    sameSite: 'None' 
+  });
   res.json({ success: true });
 });
 
@@ -166,7 +185,10 @@ app.get('/api/ping', (req, res) => res.status(200).send('pong'));
 const PING_INTERVAL = 14 * 60 * 1000;
 function keepAlive() {
   setInterval(async () => {
-    try { await axios.get("https://portfolio-api-1ak2.onrender.com/api/ping"); } catch (e) { console.error("Ping error"); }
+    try { 
+      // Öz URL-ini dinamik və ya env-dən götürsən daha yaxşı olar
+      await axios.get("https://portfolio-api-1ak2.onrender.com/api/ping"); 
+    } catch (e) { console.error("Keep-alive ping failed"); }
   }, PING_INTERVAL);
 }
 keepAlive();
@@ -174,6 +196,7 @@ keepAlive();
 // DB qoşulması
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(process.env.PORT || 5001, () => console.log("Server running..."));
+    const PORT = process.env.PORT || 5001;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch(err => console.error("DB connection error:", err));

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Admin from './pages/Admin.jsx';
 import toast, { Toaster } from 'react-hot-toast';
 import { Analytics } from "@vercel/analytics/react";
 import './App.css';
@@ -220,205 +221,14 @@ const Home = () => {
   );
 };
 
-// --- ADMIN KOMPONENTİ ---
-const Admin = () => {
-  const [messages, setMessages] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
-  
-  const [currentTag, setCurrentTag] = useState("");
-  const [editingId, setEditingId] = useState(null);
-  const [newProject, setNewProject] = useState({ title: '', description: '', detailedDescription: '', stack: [], type: '', githubLink: '', liveLink: '' });
-  
-  const API_BASE = getApiUrl();
-
-  useEffect(() => { checkSession(); }, []);
-
-  const checkSession = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/admin/check`, { credentials: 'include' });
-      if (res.ok) { setIsAuthenticated(true); fetchData(); }
-    } catch (err) { console.log("No session"); } finally { setLoading(false); }
-  };
-
-  const fetchData = async () => {
-    const [msgRes, projRes] = await Promise.all([
-      fetch(`${API_BASE}/messages`, { credentials: 'include' }),
-      fetch(`${API_BASE}/projects`)
-    ]);
-    const msgData = await msgRes.json();
-    const projData = await projRes.json();
-    if (Array.isArray(msgData)) setMessages(msgData);
-    if (Array.isArray(projData)) setProjects(projData);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && currentTag.trim() !== "") {
-      e.preventDefault();
-      if (!newProject.stack.includes(currentTag.trim())) {
-        setNewProject({ ...newProject, stack: [...newProject.stack, currentTag.trim()] });
-      }
-      setCurrentTag("");
-    }
-  };
-
-  const startEdit = (p) => {
-    setEditingId(p._id);
-    setNewProject({
-      title: p.title || '',
-      description: p.description || '',
-      detailedDescription: p.detailedDescription || '',
-      stack: p.stack || [],
-      type: p.type || '',
-      githubLink: p.githubLink || '',
-      liveLink: p.liveLink || ''
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleAddProject = async (e) => {
-    e.preventDefault();
-    const method = editingId ? 'PUT' : 'POST';
-    const url = editingId ? `${API_BASE}/projects/${editingId}` : `${API_BASE}/projects`;
-
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newProject),
-      credentials: 'include'
-    });
-    if (res.ok) {
-      toast.success(editingId ? "Updated!" : "Added!");
-      setEditingId(null);
-      setNewProject({ title: '', description: '', detailedDescription: '', stack: [], type: '', githubLink: '', liveLink: '' });
-      fetchData();
-    }
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const res = await fetch(`${API_BASE}/admin/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(loginData),
-      credentials: 'include'
-    });
-    const data = await res.json();
-    if (data.success) { setIsAuthenticated(true); fetchData(); }
-    else toast.error("Denied");
-  };
-
-  const handleLogout = async () => {
-    await fetch(`${API_BASE}/admin/logout`, { method: 'POST', credentials: 'include' });
-    setIsAuthenticated(false);
-  };
-
-  if (loading) return <div className="admin-loading">Loading...</div>;
-
-  if (!isAuthenticated) return (
-    <div className="admin-login-page">
-      <form onSubmit={handleLogin} className="admin-login-form">
-        <h2>Admin Panel</h2>
-        <input type="text" placeholder="Username" value={loginData.username} onChange={e => setLoginData({...loginData, username: e.target.value})} required />
-        <input type="password" placeholder="Password" value={loginData.password} onChange={e => setLoginData({...loginData, password: e.target.value})} required />
-        <button type="submit" className="btn btn-primary">Login</button>
-      </form>
-    </div>
-  );
-
-  return (
-    <div className="admin-dashboard">
-      <header className="admin-header">
-        <div className="brand">agshin.xyz</div>
-        <button onClick={handleLogout} className="logout-btn">Logout</button>
-      </header>
-      <div className="container admin-container">
-        <section className="admin-section">
-          <h2>{editingId ? "Edit Project" : "Add Project"}</h2>
-          <form onSubmit={handleAddProject} className="project-form">
-            <input type="text" placeholder="Title" value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} required />
-            <input type="text" placeholder="Type" value={newProject.type} onChange={e => setNewProject({...newProject, type: e.target.value})} />
-            <textarea placeholder="Short Description" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} required />
-            <textarea placeholder="Detailed Description" value={newProject.detailedDescription} onChange={e => setNewProject({...newProject, detailedDescription: e.target.value})} />
-            
-            <div className="tags-input-container">
-              {newProject.stack.map((tag, i) => (
-                <div key={i} className="tag-item">{tag}<button type="button" onClick={() => setNewProject({...newProject, stack: newProject.stack.filter((_, idx)=>idx!==i)})}>×</button></div>
-              ))}
-              <input type="text" placeholder="Stack + Enter" value={currentTag} onChange={e => setCurrentTag(e.target.value)} onKeyDown={handleKeyDown} />
-            </div>
-
-            <div className="input-row" style={{display:'flex', gap:'10px'}}>
-              <input 
-                type="text" 
-                placeholder="GitHub Link" 
-                value={newProject.githubLink} 
-                onChange={e => setNewProject({...newProject, githubLink: e.target.value})} 
-                style={{flex:1}} 
-              />
-              <input 
-                type="text" 
-                placeholder="Live Link" 
-                value={newProject.liveLink} 
-                onChange={e => setNewProject({...newProject, liveLink: e.target.value})} 
-                style={{flex:1}} 
-              />
-            </div>
-
-            <button type="submit" className="btn btn-primary">{editingId ? "Update" : "Save"}</button>
-            {editingId && (
-              <button 
-                type="button" 
-                onClick={() => { setEditingId(null); setNewProject({title:'', description:'', detailedDescription:'', stack:[], type:'', githubLink:'', liveLink:''}); }} 
-                className="btn-secondary"
-                style={{marginTop: '10px'}}
-              >
-                Cancel
-              </button>
-            )}
-          </form>
-
-          <div className="admin-list" style={{marginTop:'20px'}}>
-            {projects.map(p => (
-              <div key={p._id} className="admin-item" style={{display:'flex', justifyContent:'space-between', background:'#18181b', padding:'15px', borderRadius:'10px', marginBottom:'10px'}}>
-                <span>{p.title}</span>
-                <div style={{display:'flex', gap:'10px'}}>
-                  <button onClick={() => startEdit(p)} style={{background:'#27272a', color:'white', border:'none', padding:'5px 10px', borderRadius:'5px', cursor:'pointer'}}>Edit</button>
-                  <button onClick={async () => { if(window.confirm("Delete?")) { await fetch(`${API_BASE}/projects/${p._id}`, {method:'DELETE', credentials:'include'}); fetchData(); } }} className="delete-btn">Delete</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="admin-section">
-          <h2>Messages</h2>
-          {messages.map(m => (
-            <div key={m._id} className="admin-message-card" style={{background:'#18181b', padding:'20px', borderRadius:'10px', marginBottom:'10px'}}>
-              <div className="message-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px'}}>
-                <h3>{m.name}</h3>
-                <span className="message-email" style={{color: '#10b981', fontSize: '14px', fontFamily: 'monospace'}}>{m.email}</span>
-              </div>
-              <p style={{color: '#e4e4e7', whiteSpace: 'pre-wrap'}}>{m.text}</p>
-              <div className="message-footer" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px'}}>
-                <span style={{color: '#71717a', fontSize: '12px'}}>{new Date(m.createdAt).toLocaleString()}</span>
-                <button onClick={async () => { if(window.confirm("Delete?")) { await fetch(`${API_BASE}/messages/${m._id}`, {method:'DELETE', credentials:'include'}); fetchData(); } }} className="delete-btn">Delete</button>
-              </div>
-            </div>
-          ))}
-        </section>
-      </div>
-    </div>
-  );
-};
-
 export default function App() { 
   return (
     <BrowserRouter>
       <Toaster position="bottom-left" />
-      <Routes><Route path="/" element={<Home />} /><Route path="/admin" element={<Admin />} /></Routes>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
       <Analytics />
     </BrowserRouter>
   ); 
