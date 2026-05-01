@@ -1,46 +1,51 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  FiHome, FiMail, FiLayers, FiLogOut, FiPlus, FiTrash2, FiActivity, FiMessageSquare 
+} from 'react-icons/fi';
+import './Admin.css';
+
 const Admin = () => {
+  const [activeTab, setActiveTab] = useState('home');
   const [messages, setMessages] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
 
-
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
-  //  Səhifə açılanda sessiyanı yoxla 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/admin/check`, { credentials: 'include' });
-        if (res.ok) {
-          setIsAuthenticated(true);
-          fetchMessages();
-        }
-      } catch (err) {
-        console.log("Session check failed:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     checkSession();
   }, []);
 
-  //  Mesajları çəkən funksiya 
-  const fetchMessages = async () => {
+  const checkSession = async () => {
     try {
-      const res = await fetch(`${API_BASE}/messages`, { credentials: 'include' });
-      if (res.status === 401) {
-        setIsAuthenticated(false);
-        return;
+      const res = await fetch(`${API_BASE}/admin/check`, { credentials: 'include' });
+      if (res.ok) {
+        setIsAuthenticated(true);
+        fetchAllData();
       }
-      const data = await res.json();
-      if (Array.isArray(data)) setMessages(data);
     } catch (err) {
-      console.error("Failed to fetch messages:", err);
+      console.log("Session check failed");
+    } finally {
+      setLoading(false);
     }
   };
 
-  //  backend Login 
+  const fetchAllData = async () => {
+    try {
+      const [msgRes, projRes] = await Promise.all([
+        fetch(`${API_BASE}/messages`, { credentials: 'include' }),
+        fetch(`${API_BASE}/projects`)
+      ]);
+      
+      if (msgRes.ok) setMessages(await msgRes.json());
+      if (projRes.ok) setProjects(await projRes.json());
+    } catch (err) {
+      console.error("Data fetch failed");
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -50,12 +55,10 @@ const Admin = () => {
         body: JSON.stringify(loginData),
         credentials: 'include' 
       });
-
       const data = await response.json();
-
       if (data.success) {
         setIsAuthenticated(true);
-        fetchMessages();
+        fetchAllData();
       } else {
         alert(data.message || "Entry denied!");
       }
@@ -64,90 +67,119 @@ const Admin = () => {
     }
   };
 
-  // Logout 
   const handleLogout = async () => {
-    try {
-      await fetch(`${API_BASE}/admin/logout`, { 
-        method: 'POST', 
-        credentials: 'include' 
-      });
-      setIsAuthenticated(false);
-      setMessages([]);
-    } catch (err) {
-      console.error("Logout error:", err);
-    }
+    await fetch(`${API_BASE}/admin/logout`, { method: 'POST', credentials: 'include' });
+    setIsAuthenticated(false);
   };
 
   const deleteMsg = async (id) => {
-    if (window.confirm("Are you sure you want to delete this message?")) {
-      try {
-        const res = await fetch(`${API_BASE}/messages/${id}`, { 
-          method: 'DELETE', 
-          credentials: 'include' 
-        });
-        if (res.ok) fetchMessages();
-      } catch (err) {
-        alert("Error occurred while deleting the message!");
-      }
+    if (window.confirm("Silinsin?")) {
+      const res = await fetch(`${API_BASE}/messages/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) fetchAllData();
     }
   };
 
-  if (loading) return <div style={{background:'#09090b', color:'white', height:'100vh', display:'flex', alignItems:'center', justifyContent:'center'}}>Loading...</div>;
+  if (loading) return <div className="loader-screen">Loading...</div>;
 
   if (!isAuthenticated) {
     return (
-      <div style={{ background: '#09090b', minHeight: '100vh', display: 'flex', flexDirection: 'column', color: 'white' }}>
-        <header style={{ padding: '30px 50px' }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '4px' }}>A G S H I N</div>
-        </header>
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <form onSubmit={handleLogin} style={{ background: '#18181b', padding: '40px', borderRadius: '16px', border: '1px solid #27272a', width: '350px' }}>
-            <h2 style={{ marginBottom: '30px', textAlign: 'center' }}>Admin Access</h2>
-            <input 
-              type="text" 
-              placeholder="Username" 
-              value={loginData.username} 
-              onChange={(e) => setLoginData({...loginData, username: e.target.value})} 
-              style={{ background: '#09090b', border: '1px solid #27272a', color: 'white', padding: '12px', borderRadius: '8px', width: '100%', marginBottom: '20px', outline: 'none' }} 
-              required 
-            />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              value={loginData.password} 
-              onChange={(e) => setLoginData({...loginData, password: e.target.value})} 
-              style={{ background: '#09090b', border: '1px solid #27272a', color: 'white', padding: '12px', borderRadius: '8px', width: '100%', marginBottom: '30px', outline: 'none' }} 
-              required 
-            />
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Login</button>
-          </form>
-        </div>
+      <div className="login-wrapper">
+        <form onSubmit={handleLogin} className="login-box">
+          <h2>ADMIN ACCESS</h2>
+          <input type="text" placeholder="Username" value={loginData.username} onChange={(e) => setLoginData({...loginData, username: e.target.value})} required />
+          <input type="password" placeholder="Password" value={loginData.password} onChange={(e) => setLoginData({...loginData, password: e.target.value})} required />
+          <button type="submit">LOGIN</button>
+        </form>
       </div>
     );
   }
 
   return (
-    <div style={{ background: '#09090b', minHeight: '100vh', color: '#fff', padding: '0 0 60px 0' }}>
-      <header style={{ padding: '30px 50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #18181b' }}>
-        <div style={{ fontSize: '24px', fontWeight: 'bold', letterSpacing: '4px' }}>A G S H I N</div>
-        <button onClick={handleLogout} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontWeight: '500' }}>Logout</button>
-      </header>
-      <div className="container" style={{ marginTop: '40px', padding: '0 50px' }}>
-        <h2 style={{ marginBottom: '30px' }}>Dashboard</h2>
-        <div style={{ display: 'grid', gap: '20px' }}>
-          {messages.length > 0 ? messages.map((m) => (
-            <div key={m._id} style={{ background: '#18181b', border: '1px solid #27272a', padding: '24px', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <h3 style={{ margin: '0 0 8px 0' }}>{m.name}</h3>
-                <p style={{ color: '#a1a1aa', fontSize: '14px' }}>{m.email}</p>
-                <p style={{ color: '#e4e4e7', marginTop: '15px', whiteSpace: 'pre-wrap' }}>{m.text}</p>
-                <p style={{ color: '#71717a', fontSize: '12px', marginTop: '10px' }}>{new Date(m.createdAt).toLocaleString()}</p>
+    <div className="admin-dashboard">
+      <aside className="sidebar">
+        <div className="sidebar-logo">A H</div>
+        <nav className="sidebar-menu">
+          <button className={activeTab === 'home' ? 'active' : ''} onClick={() => setActiveTab('home')}>
+            <FiHome /> <span>Home</span>
+          </button>
+          <button className={activeTab === 'messages' ? 'active' : ''} onClick={() => setActiveTab('messages')}>
+            <FiMail /> <span>Messages</span>
+          </button>
+          <button className={activeTab === 'projects' ? 'active' : ''} onClick={() => setActiveTab('projects')}>
+            <FiLayers /> <span>Projects</span>
+          </button>
+        </nav>
+        <button onClick={handleLogout} className="logout-btn-sidebar"><FiLogOut /> <span>Logout</span></button>
+      </aside>
+
+      <main className="content">
+        {activeTab === 'home' && (
+          <div className="home-tab">
+            <h1>Xoş gəldin, Agşin.</h1>
+            <div className="stats-grid">
+              <div className="stat-card">
+                <FiMessageSquare />
+                <h3>{messages.length}</h3>
+                <p>Messages</p>
               </div>
-              <button onClick={() => deleteMsg(m._id)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' }}>Delete</button>
+              <div className="stat-card">
+                <FiLayers />
+                <h3>{projects.length}</h3>
+                <p>Projects</p>
+              </div>
+              <div className="stat-card">
+                <FiActivity />
+                <h3>Online</h3>
+                <p>Status</p>
+              </div>
             </div>
-          )) : <p>No messages yet..</p>}
-        </div>
-      </div>
+          </div>
+        )}
+
+        {activeTab === 'messages' && (
+          <div className="messages-tab">
+            <h2>Gələn Mesajlar</h2>
+            <div className="msg-list">
+              {messages.map(m => (
+                <div key={m._id} className="msg-card">
+                  <div className="msg-header">
+                    <div>
+                      <h4>{m.name}</h4>
+                      <p>{m.email}</p>
+                    </div>
+                    <button onClick={() => deleteMsg(m._id)}><FiTrash2 /></button>
+                  </div>
+                  <div className="msg-body">{m.text}</div>
+                  <div className="msg-footer">{new Date(m.createdAt).toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'projects' && (
+          <div className="projects-tab">
+            <div className="tab-header">
+              <h2>Layihələr</h2>
+              <button className="add-proj-btn"><FiPlus /> Add Project</button>
+            </div>
+            <div className="proj-grid">
+              {projects.map(p => (
+                <div key={p._id} className="proj-admin-card">
+                  <h4>{p.title}</h4>
+                  <p>{p.category}</p>
+                  <div className="proj-actions">
+                    <button>Edit</button>
+                    <button className="del">Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 };
+
+export default Admin;

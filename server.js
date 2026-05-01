@@ -40,7 +40,7 @@ const limiterHelper = (windowMs, max, message) => rateLimit({
   windowMs,
   max,
   keyGenerator: (req) => req.headers['x-forwarded-for']?.split(',')[0] || req.ip,
-  validate: { xForwardedForHeader: false }, // Kitabxananın "həyəcan təbilini" söndürürük
+  validate: { xForwardedForHeader: false }, 
   handler: (req, res) => res.status(429).json({ success: false, message })
 });
 
