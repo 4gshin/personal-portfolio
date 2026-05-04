@@ -1,3 +1,9 @@
+/* 
+  AGSHIN.XYZ - FULL SYSTEM STYLESHEET 
+  Premium Dark Aesthetics, Grid Fixes & UI Animations
+*/
+
+/* --- 1. UNIVERSAL RESET & VARIABLES --- */
 :root {
   --bg: #000000;
   --admin-bg: #09090b;
@@ -28,17 +34,17 @@ body {
 
 /* --- 2. MODAL SYSTEM FIX --- */
 .modal-overlay {
-  position: fixed !important; /* Ekranın üzərində donub qalması üçün */
+  position: fixed !important;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.85); /* Qaranlıq fon */
-  backdrop-filter: blur(12px); /* MacBook-stili bulanıqlıq */
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000 !important; /* Hər şeyin üzərində olması üçün[cite: 3] */
+  z-index: 10000 !important;
   padding: 20px;
 }
 
@@ -51,7 +57,7 @@ body {
   padding: 40px;
   position: relative;
   max-height: 90vh;
-  overflow-y: auto; /* İçindəki mətn çox olsa, daxildə scroll olsun[cite: 3] */
+  overflow-y: auto;
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
   animation: modalScale 0.3s ease-out;
 }
@@ -75,9 +81,8 @@ body {
 
 .close-modal:hover { color: #fff; transform: rotate(90deg); }
 
-/* --- 3. ADMIN PANEL COMPONENTS[cite: 3] --- */
-.admin-loading,
-.admin-login-page {
+/* --- 3. ADMIN PANEL COMPONENTS --- */
+.admin-loading, .admin-login-page {
   min-height: 100vh;
   background: var(--admin-bg);
   display: flex;
@@ -110,36 +115,17 @@ body {
   padding: 26px 18px;
   display: flex;
   flex-direction: column;
-  z-index: 100; /* Sidebar hər zaman üstdə[cite: 3] */
+  z-index: 100;
 }
 
 .admin-main {
-  margin-left: 280px; /* Sidebarla toqquşmaması üçün[cite: 3] */
+  margin-left: 280px;
   flex: 1;
   min-height: 100vh;
   padding: 48px;
 }
 
-/* --- 4. ADMIN STATS & LISTS[cite: 3] --- */
-.admin-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin-bottom: 30px;
-}
-
-.admin-stat-card,
-.admin-project-form,
-.admin-message-card,
-.admin-project-card,
-.admin-empty {
-  background: var(--admin-panel);
-  border: 1px solid var(--admin-border);
-  border-radius: 24px;
-  padding: 28px;
-}
-
-/* --- 5. INPUTS & BUTTONS[cite: 3] --- */
+/* --- 4. INPUTS & DYNAMIC HOVER EFFECTS --- */
 .admin-login-form input,
 .admin-project-form input,
 .admin-project-form textarea,
@@ -153,8 +139,17 @@ body {
   outline: none;
   font: inherit;
   margin-bottom: 12px;
+  transition: all 0.2s ease;
 }
 
+.admin-login-form input:focus,
+.admin-project-form input:focus,
+.admin-project-form textarea:focus {
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* --- 5. BUTTONS & ANIMATIONS --- */
 .admin-primary-btn, .admin-login-form button {
   background: #fff;
   color: #000;
@@ -163,10 +158,34 @@ body {
   border-radius: 14px;
   font-weight: 800;
   cursor: pointer;
+  transition: all 0.3s var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.admin-primary-btn:hover, .admin-login-form button:hover {
+  background: #e4e4e7;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.05);
+}
+
+.admin-secondary-btn {
+  background: var(--admin-panel-soft);
+  color: #fff;
+  border: 1px solid var(--admin-border);
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
   transition: var(--transition);
 }
 
-.admin-primary-btn:hover { background: #e4e4e7; }
+.admin-secondary-btn:hover {
+  background: #27272a;
+  transform: translateY(-1px);
+}
 
 .admin-danger-btn {
   background: rgba(239, 68, 68, 0.1);
@@ -174,10 +193,67 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.2);
   padding: 10px 14px;
   border-radius: 12px;
+  font-weight: 700;
   cursor: pointer;
+  transition: var(--transition);
 }
 
-/* --- 6. RESPONSIVE DESIGN[cite: 3] --- */
+.admin-danger-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fff;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* --- 6. SIDEBAR MENU & STATS --- */
+.admin-sidebar-menu button {
+  width: 100%;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--admin-muted);
+  padding: 14px 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: 0.2s ease;
+}
+
+.admin-sidebar-menu button:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+.admin-sidebar-menu button.active {
+  background: var(--admin-panel-soft);
+  border-color: var(--admin-border);
+  color: #fff;
+  box-shadow: inset 4px 0 0 var(--admin-accent);
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.admin-stat-card {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: 24px;
+  padding: 28px;
+}
+
+.admin-stat-card strong {
+  display: block;
+  font-size: 42px;
+  margin-top: 10px;
+  letter-spacing: -0.05em;
+}
+
+/* --- 7. RESPONSIVE DESIGN --- */
 @media (max-width: 900px) {
   .admin-sidebar {
     position: sticky;
@@ -189,9 +265,6 @@ body {
     flex-direction: row;
     overflow-x: auto;
   }
-  .admin-main {
-    margin-left: 0;
-    padding: 28px 18px;
-  }
+  .admin-main { margin-left: 0; padding: 28px 18px; }
   .admin-stats-grid { grid-template-columns: 1fr; }
 }
