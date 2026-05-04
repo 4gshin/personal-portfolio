@@ -1,11 +1,9 @@
 /* 
-  AGSHIN.XYZ - FULL SYSTEM STYLESHEET 
-  Premium Dark Aesthetics, Grid Fixes & UI Animations
+  AGSHIN.XYZ - FULL MASTER STYLESHEET 
+  Everything restored: Premium Admin UI, Home Section, & Modal Fixes
 */
 
-/* --- 1. UNIVERSAL RESET & VARIABLES --- */
 :root {
-  --bg: #000000;
   --admin-bg: #09090b;
   --admin-panel: #121214;
   --admin-panel-soft: #18181b;
@@ -18,6 +16,7 @@
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* --- UNIVERSAL RESET --- */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -26,13 +25,13 @@
 
 body {
   font-family: 'Inter', -apple-system, sans-serif;
-  background-color: var(--bg);
+  background-color: #000;
   color: var(--admin-text);
   line-height: 1.6;
   overflow-x: hidden;
 }
 
-/* --- 2. MODAL SYSTEM FIX --- */
+/* --- 1. HOME & PORTFOLIO MODAL FIX --- */
 .modal-overlay {
   position: fixed !important;
   top: 0;
@@ -44,7 +43,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000 !important;
+  z-index: 10000 !important; /* Hər şeyin üzərində sabit qalır */
   padding: 20px;
 }
 
@@ -59,12 +58,7 @@ body {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-  animation: modalScale 0.3s ease-out;
-}
-
-@keyframes modalScale {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  animation: adminFade 0.3s ease;
 }
 
 .close-modal {
@@ -81,10 +75,12 @@ body {
 
 .close-modal:hover { color: #fff; transform: rotate(90deg); }
 
-/* --- 3. ADMIN PANEL COMPONENTS --- */
-.admin-loading, .admin-login-page {
+/* --- 2. ADMIN LOGIN PAGE --- */
+.admin-loading,
+.admin-login-page {
   min-height: 100vh;
   background: var(--admin-bg);
+  color: var(--admin-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,10 +95,27 @@ body {
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
 }
 
+.admin-login-logo {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  background: #fff;
+  color: #000;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  margin-bottom: 22px;
+}
+
+.admin-login-form h2 { margin: 0 0 8px; font-size: 30px; }
+.admin-login-form p { color: var(--admin-muted); margin: 0 0 26px; }
+
+/* --- 3. ADMIN DASHBOARD LAYOUT --- */
 .admin-dashboard {
-  display: flex;
   min-height: 100vh;
   background: var(--admin-bg);
+  color: var(--admin-text);
+  display: flex;
 }
 
 .admin-sidebar {
@@ -125,146 +138,66 @@ body {
   padding: 48px;
 }
 
-/* --- 4. INPUTS & DYNAMIC HOVER EFFECTS --- */
-.admin-login-form input,
-.admin-project-form input,
-.admin-project-form textarea,
-.admin-tags-input input {
-  width: 100%;
-  background: #0f0f11;
-  color: var(--admin-text);
-  border: 1px solid var(--admin-border);
-  border-radius: 14px;
-  padding: 14px 16px;
-  outline: none;
-  font: inherit;
-  margin-bottom: 12px;
-  transition: all 0.2s ease;
+.admin-view {
+  max-width: 1180px;
+  animation: adminFade 0.25s ease;
 }
 
-.admin-login-form input:focus,
-.admin-project-form input:focus,
-.admin-project-form textarea:focus {
-  border-color: var(--admin-accent);
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+@keyframes adminFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- 5. BUTTONS & ANIMATIONS --- */
-.admin-primary-btn, .admin-login-form button {
-  background: #fff;
-  color: #000;
-  border: 0;
-  padding: 14px 20px;
-  border-radius: 14px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.3s var(--transition);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+/* --- 4. SIDEBAR MENU & BRAND --- */
+.admin-sidebar-brand { display: flex; align-items: center; gap: 14px; padding: 8px 10px 28px; }
+.admin-sidebar-logo { width: 46px; height: 46px; border-radius: 16px; background: #fff; color: #000; display: grid; place-items: center; font-weight: 900; }
+.admin-sidebar-brand strong { display: block; letter-spacing: -0.03em; }
+.admin-sidebar-brand span { display: block; margin-top: 3px; font-size: 13px; color: var(--admin-muted); }
+
+.admin-sidebar-menu { display: flex; flex-direction: column; gap: 8px; }
+.admin-sidebar-menu button, .admin-sidebar-logout {
+  width: 100%; border: 1px solid transparent; background: transparent; color: var(--admin-muted); padding: 14px 16px; border-radius: 16px; cursor: pointer; text-align: left; font: inherit; display: flex; align-items: center; gap: 12px; transition: 0.2s ease;
 }
 
-.admin-primary-btn:hover, .admin-login-form button:hover {
-  background: #e4e4e7;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.05);
+.admin-sidebar-menu button:hover { background: rgba(255, 255, 255, 0.04); color: #fff; }
+.admin-sidebar-menu button.active { background: var(--admin-panel-soft); border-color: var(--admin-border); color: #fff; box-shadow: inset 3px 0 0 var(--admin-accent); }
+.admin-sidebar-logout { margin-top: auto; color: #fecaca; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.16); }
+
+/* --- 5. FORMS, INPUTS & BUTTONS --- */
+.admin-login-form input, .admin-project-form input, .admin-project-form textarea, .admin-tags-input input {
+  width: 100%; background: #0f0f11; color: var(--admin-text); border: 1px solid var(--admin-border); border-radius: 14px; padding: 14px 16px; outline: none; font: inherit; transition: var(--transition);
 }
 
-.admin-secondary-btn {
-  background: var(--admin-panel-soft);
-  color: #fff;
-  border: 1px solid var(--admin-border);
-  padding: 10px 18px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
+.admin-login-form input { margin-bottom: 14px; }
+.admin-login-form input:focus, .admin-project-form input:focus, .admin-project-form textarea:focus, .admin-tags-input:focus-within {
+  border-color: rgba(16, 185, 129, 0.7); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
 }
 
-.admin-secondary-btn:hover {
-  background: #27272a;
-  transform: translateY(-1px);
+.admin-login-form button, .admin-primary-btn {
+  border: 0; background: #fff; color: #000; padding: 14px 18px; border-radius: 14px; font-weight: 800; cursor: pointer; transition: var(--transition);
 }
 
-.admin-danger-btn {
-  background: rgba(239, 68, 68, 0.1);
-  color: #fecaca;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
-}
+.admin-primary-btn:hover, .admin-login-form button:hover { background: #e4e4e7; transform: translateY(-2px); }
+.admin-secondary-btn, .admin-danger-btn { border: 1px solid var(--admin-border); padding: 10px 14px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+.admin-secondary-btn { background: var(--admin-panel-soft); color: #fff; }
+.admin-secondary-btn:hover { background: #27272a; }
+.admin-danger-btn { background: rgba(239, 68, 68, 0.1); color: #fecaca; border-color: rgba(239, 68, 68, 0.18); }
+.admin-danger-btn:hover { background: rgba(239, 68, 68, 0.2); color: #fff; }
 
-.admin-danger-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fff;
-  border-color: rgba(239, 68, 68, 0.4);
-}
+/* --- 6. CARDS & GRIDS --- */
+.admin-stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.admin-stat-card, .admin-project-form, .admin-message-card, .admin-project-card, .admin-empty { background: var(--admin-panel); border: 1px solid var(--admin-border); border-radius: 24px; padding: 28px; }
+.admin-stat-card span { color: var(--admin-muted); }
+.admin-stat-card strong { display: block; font-size: 42px; margin-top: 14px; letter-spacing: -0.05em; }
+.status-good { color: var(--admin-accent); }
 
-/* --- 6. SIDEBAR MENU & STATS --- */
-.admin-sidebar-menu button {
-  width: 100%;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--admin-muted);
-  padding: 14px 16px;
-  border-radius: 16px;
-  cursor: pointer;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: 0.2s ease;
-}
+.admin-list, .admin-project-list { display: grid; gap: 14px; }
+.admin-message-card { padding: 22px; }
+.admin-message-top, .admin-project-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
 
-.admin-sidebar-menu button:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: #fff;
-}
-
-.admin-sidebar-menu button.active {
-  background: var(--admin-panel-soft);
-  border-color: var(--admin-border);
-  color: #fff;
-  box-shadow: inset 4px 0 0 var(--admin-accent);
-}
-
-.admin-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin-bottom: 30px;
-}
-
-.admin-stat-card {
-  background: var(--admin-panel);
-  border: 1px solid var(--admin-border);
-  border-radius: 24px;
-  padding: 28px;
-}
-
-.admin-stat-card strong {
-  display: block;
-  font-size: 42px;
-  margin-top: 10px;
-  letter-spacing: -0.05em;
-}
-
-/* --- 7. RESPONSIVE DESIGN --- */
+/* --- 7. RESPONSIVE --- */
 @media (max-width: 900px) {
-  .admin-sidebar {
-    position: sticky;
-    top: 0;
-    width: 100%;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--admin-border);
-    flex-direction: row;
-    overflow-x: auto;
-  }
+  .admin-sidebar { position: sticky; top: 0; width: 100%; height: auto; border-right: 0; border-bottom: 1px solid var(--admin-border); flex-direction: row; overflow-x: auto; }
   .admin-main { margin-left: 0; padding: 28px 18px; }
   .admin-stats-grid { grid-template-columns: 1fr; }
 }
