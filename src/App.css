@@ -1,8 +1,3 @@
-/* 
-  AGSHIN.XYZ - FULL MASTER STYLESHEET 
-  Everything restored: Premium Admin UI, Home Section, & Modal Fixes
-*/
-
 :root {
   --admin-bg: #09090b;
   --admin-panel: #121214;
@@ -43,7 +38,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000 !important; /* Hər şeyin üzərində sabit qalır */
+  z-index: 10000 !important;
   padding: 20px;
 }
 
@@ -74,6 +69,25 @@ body {
 }
 
 .close-modal:hover { color: #fff; transform: rotate(90deg); }
+
+.modal-footer {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    padding: 30px 20px; 
+  }
+  .modal-footer {
+    flex-direction: column; 
+  }
+  .modal-footer .btn {
+    width: 100%; 
+    justify-content: center;
+  }
+}
 
 /* --- 2. ADMIN LOGIN PAGE --- */
 .admin-loading,
