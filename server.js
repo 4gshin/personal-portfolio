@@ -22,7 +22,7 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json({ limit: '10kb' })); 
 
-// 2. CORS AYARLARI (Tam Fix)
+// 2. CORS AYARLARI
 const allowedOrigins = [
   'http://localhost:5173', 
   'http://localhost:3000',
@@ -32,11 +32,10 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // origin yoxdursa (məs. Postman) və ya siyahıdadırsa icazə ver
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log("Blocked by CORS:", origin); // Hansı originin bloklandığını görmək üçün
+      console.log("Blocked by CORS:", origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -45,16 +44,21 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 3. RATE LIMITERS (IPv6 Fix)
+// 3. RATE LIMITERS (IPv6 & Proxy Warning Fix)
 const limiterHelper = (windowMs, max, message) => rateLimit({
   windowMs,
   max,
-  keyGenerator: (req) => req.headers['x-forwarded-for']?.split(',')[0] || req.ip,
-  validate: { xForwardedForHeader: false }, 
+  // Express-rate-limit-in daxili IPv6 xəbərdarlıq sistemini sakitləşdiririk
+  validate: { defaultValidations: false }, 
+  keyGenerator: (req) => {
+    // Render proxy-sindən gələn real istifadəçi IP-sini təhlükəsiz şəkildə dartırıq
+    const xForwardedFor = req.headers['x-forwarded-for'];
+    return xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.ip;
+  },
   handler: (req, res) => res.status(429).json({ success: false, message })
 });
 
-const loginLimiter = limiterHelper(15 * 60 * 1000, 10, "Too many login attempts."); // Test üçün limiti bir az artırdım
+const loginLimiter = limiterHelper(15 * 60 * 1000, 10, "Too many login attempts.");
 const contactLimiter = limiterHelper(60 * 60 * 1000, 5, "Spam protection active.");
 
 // 4. VALIDATION SCHEMAS (Joi)
@@ -95,12 +99,11 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
     if (isMatch) {
       const token = jwt.sign({ user: username }, process.env.JWT_SECRET, { expiresIn: '12h' });
       
-      // Render-də kuki üçün mütləq Secure və SameSite None olmalıdır
       res.cookie('admin_token', token, { 
         httpOnly: true, 
         secure: true, 
         sameSite: 'None', 
-        maxAge: 12 * 60 * 60 * 1000 // 12 saat
+        maxAge: 12 * 60 * 60 * 1000 
       });
       return res.json({ success: true });
     }
@@ -181,14 +184,16 @@ app.delete('/api/projects/:id', protect, async (req, res) => {
 
 app.get('/api/ping', (req, res) => res.status(200).send('pong'));
 
-// Keep-alive məntiqi
-const PING_INTERVAL = 14 * 60 * 1000;
+// Keep-alive məntiqi (Render üçün 10 dəqiqəyə salındı ki, yuxuya getməsin)
+const PING_INTERVAL = 10 * 60 * 1000;
 function keepAlive() {
   setInterval(async () => {
     try { 
-      // Öz URL-ini dinamik və ya env-dən götürsən daha yaxşı olar
-      await axios.get("https://portfolio-api-1ak2.onrender.com/api/ping"); 
-    } catch (e) { console.error("Keep-alive ping failed"); }
+      await axios.get("https://portfolio-api-1ak2.onrender.com/api/ping", { timeout: 5000 }); 
+      console.log("Self-ping successful.");
+    } catch (e) { 
+      console.error("Keep-alive ping failed:", e.message); 
+    }
   }, PING_INTERVAL);
 }
 keepAlive();
