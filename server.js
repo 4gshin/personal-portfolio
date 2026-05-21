@@ -44,14 +44,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 3. RATE LIMITERS (IPv6 & Proxy Warning Fix)
+// 3. RATE LIMITERS 
 const limiterHelper = (windowMs, max, message) => rateLimit({
   windowMs,
   max,
-  // Express-rate-limit-in daxili IPv6 xəbərdarlıq sistemini sakitləşdiririk
-  validate: { defaultValidations: false }, 
+  validate: false, 
   keyGenerator: (req) => {
-    // Render proxy-sindən gələn real istifadəçi IP-sini təhlükəsiz şəkildə dartırıq
     const xForwardedFor = req.headers['x-forwarded-for'];
     return xForwardedFor ? xForwardedFor.split(',')[0].trim() : req.ip;
   },
@@ -184,7 +182,6 @@ app.delete('/api/projects/:id', protect, async (req, res) => {
 
 app.get('/api/ping', (req, res) => res.status(200).send('pong'));
 
-// Keep-alive məntiqi (Render üçün 10 dəqiqəyə salındı ki, yuxuya getməsin)
 const PING_INTERVAL = 10 * 60 * 1000;
 function keepAlive() {
   setInterval(async () => {
