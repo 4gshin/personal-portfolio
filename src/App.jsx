@@ -16,7 +16,19 @@ const getApiUrl = () => import.meta.env.VITE_API_URL || "http://localhost:5001/a
 
 // Ana səhifədə maksimum neçə layihə göstərilsin (admin paneldən "featured" seçilənlər,
 // heç biri seçilməyibsə isə ən son əlavə olunanlar).
-const FEATURED_LIMIT = 4;
+const FEATURED_LIMIT = 3;
+
+// Admin paneldən verilən "order" dəyərinə görə sıralayır (1 = birinci).
+// order verilməyib / 0-dırsa, o layihə sıra siyahısının sonuna düşür və
+// öz aralarında API-dan gələn sıra (createdAt desc) qorunur.
+const sortByOrder = (a, b) => {
+  const orderA = a.order || 0;
+  const orderB = b.order || 0;
+  if (orderA === 0 && orderB === 0) return 0;
+  if (orderA === 0) return 1;
+  if (orderB === 0) return -1;
+  return orderA - orderB;
+};
 
 // --- HOME KOMPONENTİ ---
 const Home = () => {
@@ -25,9 +37,9 @@ const Home = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const API_BASE = getApiUrl();
 
-  // Admin paneldə "featured" işarələnmiş layihələri göstəririk.
+  // Admin paneldə "featured" işarələnmiş layihələri, təyin olunan "order" sırası ilə göstəririk.
   // Heç biri işarələnməyibsə, ən son əlavə olunan layihələr geri qayıdır (DB sort: createdAt desc).
-  const featuredProjects = dbProjects.filter((p) => p.featured);
+  const featuredProjects = dbProjects.filter((p) => p.featured).sort(sortByOrder);
   const displayProjects = (featuredProjects.length > 0 ? featuredProjects : dbProjects).slice(0, FEATURED_LIMIT);
 
   const handleSubmit = async (e) => {

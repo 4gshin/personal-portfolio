@@ -198,6 +198,8 @@ body {
 .admin-danger-btn { background: rgba(239, 68, 68, 0.1); color: #fecaca; border-color: rgba(239, 68, 68, 0.18); }
 .admin-danger-btn:hover { background: rgba(239, 68, 68, 0.2); color: #fff; }
 
+.admin-featured-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
 .admin-featured-toggle {
   display: flex;
   align-items: center;
@@ -212,6 +214,8 @@ body {
   width: fit-content;
 }
 .admin-featured-toggle input { width: auto; accent-color: var(--admin-accent); }
+
+.admin-order-input { max-width: 160px; }
 
 .admin-featured-badge {
   display: inline-block;

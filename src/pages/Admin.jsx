@@ -11,7 +11,9 @@ const emptyProject = {
   stack: [],
   type: '',
   githubLink: '',
-  liveLink: ''
+  liveLink: '',
+  featured: false,
+  order: 0
 };
 
 const Admin = () => {
@@ -144,7 +146,9 @@ const Admin = () => {
       stack: Array.isArray(project.stack) ? project.stack : [],
       type: project.type || '',
       githubLink: project.githubLink || '',
-      liveLink: project.liveLink || ''
+      liveLink: project.liveLink || '',
+      featured: Boolean(project.featured),
+      order: project.order || 0
     });
 
     setActiveTab('projects');
@@ -421,6 +425,28 @@ const Admin = () => {
                 />
               </div>
 
+              <div className="admin-featured-row">
+                <label className="admin-featured-toggle">
+                  <input
+                    type="checkbox"
+                    checked={projectForm.featured}
+                    onChange={(e) => handleProjectChange('featured', e.target.checked)}
+                  />
+                  Show on homepage (Featured)
+                </label>
+
+                {projectForm.featured && (
+                  <input
+                    type="number"
+                    min="1"
+                    className="admin-order-input"
+                    placeholder="Order (1 = first)"
+                    value={projectForm.order || ''}
+                    onChange={(e) => handleProjectChange('order', e.target.value === '' ? 0 : Number(e.target.value))}
+                  />
+                )}
+              </div>
+
               <div className="admin-form-actions">
                 <button type="submit" className="admin-primary-btn">
                   {editingId ? 'Update Project' : 'Save Project'}
@@ -441,7 +467,14 @@ const Admin = () => {
                 projects.map((project) => (
                   <article key={project._id} className="admin-project-card">
                     <div>
-                      <h3>{project.title}</h3>
+                      <h3>
+                        {project.title}
+                        {project.featured && (
+                          <span className="admin-featured-badge">
+                            Featured{project.order ? ` #${project.order}` : ''}
+                          </span>
+                        )}
+                      </h3>
                       <p>{project.type || 'Web Project'}</p>
                     </div>
 
