@@ -1,29 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Admin from './pages/Admin.jsx';
+import Projects from './pages/Projects.jsx';
+import SiteHeader from './components/SiteHeader.jsx';
+import SiteFooter from './components/SiteFooter.jsx';
+import ProjectCard from './components/ProjectCard.jsx';
+import ProjectModal from './components/ProjectModal.jsx';
+import { useProjects } from './hooks/useProjects.js';
 import toast, { Toaster } from 'react-hot-toast';
 import { Analytics } from "@vercel/analytics/react";
 import './App.css';
 
 const getApiUrl = () => import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
+// Ana səhifədə maksimum neçə layihə göstərilsin (admin paneldən "featured" seçilənlər,
+// heç biri seçilməyibsə isə ən son əlavə olunanlar).
+const FEATURED_LIMIT = 4;
+
 // --- HOME KOMPONENTİ ---
 const Home = () => {
   const [formData, setFormData] = useState({ name: '', email: '', text: '' });
-  const [dbProjects, setDbProjects] = useState([]);
+  const { projects: dbProjects } = useProjects();
   const [selectedProject, setSelectedProject] = useState(null);
   const API_BASE = getApiUrl();
 
-  useEffect(() => { fetchProjects(); }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/projects`);
-      const data = await res.json();
-      if (Array.isArray(data)) setDbProjects(data);
-    } catch (err) { console.error(err); }
-  };
+  // Admin paneldə "featured" işarələnmiş layihələri göstəririk.
+  // Heç biri işarələnməyibsə, ən son əlavə olunan layihələr geri qayıdır (DB sort: createdAt desc).
+  const featuredProjects = dbProjects.filter((p) => p.featured);
+  const displayProjects = (featuredProjects.length > 0 ? featuredProjects : dbProjects).slice(0, FEATURED_LIMIT);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,17 +53,8 @@ const Home = () => {
 
   return (
     <div className="page-shell">
-      <header className="site-header">
-        <div className="container nav-row">
-          <div className="brand">AGSHIN</div>
-          <nav className="nav-links">
-            <a href="#projects">Projects</a>
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
-          </nav>
-        </div>
-      </header>
-      
+      <SiteHeader />
+
       <main>
         <section className="hero-section">
           <motion.div className="container hero-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -79,65 +75,24 @@ const Home = () => {
               <h2>Featured Projects</h2>
             </motion.div>
             <div className="projects-grid">
-              {dbProjects.map((p, i) => (
-                <motion.div 
-                  key={p._id || i} 
-                  className="project-card" 
-                  {...fadeInUp} 
-                  transition={{ delay: i * 0.1 }}
-                  whileHover={{ y: -10 }}
+              {displayProjects.map((p, i) => (
+                <ProjectCard
+                  key={p._id || i}
+                  project={p}
+                  index={i}
                   onClick={() => setSelectedProject(p)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="card-content">
-                    <span className="project-type">{p.type}</span>
-                    <h3>{p.title}</h3>
-                    <p>{p.description}</p>
-                    <div className="project-stack">
-                      {p.stack?.map((s, j) => (
-                        <span key={j} className="mini-pill">{s}</span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+                />
               ))}
             </div>
+            {dbProjects.length > 0 && (
+              <div className="view-all-wrap">
+                <Link to="/projects" className="btn btn-secondary">View All Projects</Link>
+              </div>
+            )}
           </div>
         </section>
 
-        <AnimatePresence>
-          {selectedProject && (
-            <div className="modal-overlay" onClick={() => setSelectedProject(null)}>
-              <motion.div 
-                className="modal-content"
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button className="close-modal" onClick={() => setSelectedProject(null)}>×</button>
-                <span className="project-type">{selectedProject.type}</span>
-                <h2>{selectedProject.title}</h2>
-                <div className="modal-body">
-                  <p>{selectedProject.detailedDescription || selectedProject.description}</p>
-                  <div className="project-stack" style={{ marginTop: '20px' }}>
-                    {selectedProject.stack?.map((s, j) => (
-                      <span key={j} className="mini-pill">{s}</span>
-                    ))}
-                  </div>
-                </div>
-                <div className="modal-footer" style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
-                  {selectedProject.githubLink && (
-                    <a href={selectedProject.githubLink} target="_blank" rel="noreferrer" className="btn btn-secondary">GitHub</a>
-                  )}
-                  {selectedProject.liveLink && (
-                    <a href={selectedProject.liveLink} target="_blank" rel="noreferrer" className="btn btn-primary">Live Demo</a>
-                  )}
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+        <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
 
         <section id="about" className="section-block about-section">
           <div className="container about-container-lg">
@@ -181,7 +136,7 @@ const Home = () => {
                   <motion.button type="submit" className="btn btn-primary send-btn" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>Send Message</motion.button>
                 </form>
               </div>
-              
+
               <div className="contact-info-side">
                 <div className="info-block">
                   <span className="info-label">Email</span>
@@ -208,28 +163,21 @@ const Home = () => {
         </section>
       </main>
 
-      <footer className="site-footer">
-        <div className="container footer-content">
-          <div className="footer-line"></div>
-          <div className="footer-bottom">
-            <p className="copyright">© 2026 — Agshin Heybatli</p>
-            <div className="footer-status"><span className="status-dot"></span>Available for new projects</div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 };
 
-export default function App() { 
+export default function App() {
   return (
     <BrowserRouter>
       <Toaster position="bottom-left" />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/projects" element={<Projects />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
       <Analytics />
     </BrowserRouter>
-  ); 
+  );
 }

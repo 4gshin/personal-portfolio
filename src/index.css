@@ -8,7 +8,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* NAVBAR ÖRTÜLMƏSİN DEYƏ SCROLL MARGIN */
+/* NAVBAR Ã–RTÃœLMÆSÄ°N DEYÆ SCROLL MARGIN */
 section {
   scroll-margin-top: 100px;
 }
@@ -71,7 +71,16 @@ img { max-width: 100%; display: block; }
 .project-stack { display: flex; flex-wrap: wrap; gap: 8px; }
 .mini-pill { padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); color: #c4c4c9; font-size: 12px; }
 
-/* ABOUT SECTION - YENİDƏN DÜZƏNLƏNDİ */
+/* VIEW ALL PROJECTS BUTTON */
+.view-all-wrap { display: flex; justify-content: center; margin-top: 48px; }
+
+/* /projects PAGE */
+.projects-page-section { padding-top: 60px; }
+.back-link { display: inline-block; color: #a1a1aa; font-size: 14px; margin-bottom: 30px; transition: color 0.2s; }
+.back-link:hover { color: #fff; }
+.projects-loading { text-align: center; color: #a1a1aa; padding: 60px 0; font-size: 17px; }
+
+/* ABOUT SECTION - YENÄ°DÆN DÃœZÆNLÆNDÄ° */
 .about-section {
   background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
   border-radius: 60px;
@@ -133,7 +142,7 @@ img { max-width: 100%; display: block; }
   justify-content: space-between;
   align-items: center;
   color: #71717a;
-  /* Fərqli font burada təyin olunur */
+  /* FÉ™rqli font burada tÉ™yin olunur */
   font-family: 'Space Mono', monospace; 
   font-size: 13px;
   letter-spacing: 0.5px;
@@ -143,7 +152,7 @@ img { max-width: 100%; display: block; }
   display: inline-block;
   width: 6px;
   height: 6px;
-  background: #22c55e; /* Yaşıl rəng */
+  background: #22c55e; /* YaÅŸÄ±l rÉ™ng */
   border-radius: 50%;
   margin-right: 8px;
   box-shadow: 0 0 10px #22c55e;
@@ -156,7 +165,7 @@ img { max-width: 100%; display: block; }
   100% { opacity: 0.4; }
 }
 
-/* Mobil üçün uyğunlaşdırma */
+/* Mobil Ã¼Ã§Ã¼n uyÄŸunlaÅŸdÄ±rma */
 @media (max-width: 768px) {
   .footer-bottom {
     flex-direction: column;
