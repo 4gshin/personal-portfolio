@@ -33,7 +33,7 @@ const sortByOrder = (a, b) => {
 // --- HOME KOMPONENTİ ---
 const Home = () => {
   const [formData, setFormData] = useState({ name: '', email: '', text: '' });
-  const { projects: dbProjects } = useProjects();
+  const { projects: dbProjects, loading } = useProjects();
   const [selectedProject, setSelectedProject] = useState(null);
   const API_BASE = getApiUrl();
 
@@ -69,23 +69,41 @@ const Home = () => {
 
       <main>
         <section className="hero-section">
-          <motion.div className="container hero-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="hero-badge">Software Engineering Student</div>
-            <h1 className="hero-title">Agshin Heybatli</h1>
-            <p className="hero-text">Building scalable and modern web applications.</p>
-            <div className="hero-actions">
-              <a href="#projects" className="btn btn-primary">View Projects</a>
-              <a href="#contact" className="btn btn-secondary">Contact Me</a>
+          <div className="container hero-content">
+            <div className="hero-intro">
+              <p className="hero-role">Full-stack developer · Ankara</p>
+              <h1 className="hero-title">Agshin<br />Heybatli<span>.</span></h1>
+              <p className="hero-text">Software engineering student at OSTİM Technical University. I build web apps from the interface to the database.</p>
+              <div className="hero-actions">
+                <a href="#projects" className="btn btn-primary">View Projects <span aria-hidden="true">↓</span></a>
+                <a href="#contact" className="btn btn-secondary">Contact Me</a>
+              </div>
             </div>
-          </motion.div>
+
+            <a className="hero-showcase" href="https://flowershop-flax.vercel.app/" target="_blank" rel="noreferrer" aria-label="Open the FlowerShop live demo">
+              <div className="showcase-bar" aria-hidden="true">
+                <span className="showcase-dots"><i /><i /><i /></span>
+                <span>FlowerShop</span>
+                <span>↗</span>
+              </div>
+              <img src="/flowershop-preview.webp" alt="FlowerShop storefront homepage" width="1152" height="585" fetchPriority="high" />
+              <div className="showcase-caption">
+                <span>E-commerce storefront</span>
+                <span>Live demo <span aria-hidden="true">↗</span></span>
+              </div>
+            </a>
+          </div>
         </section>
 
         <section id="projects" className="section-block">
           <div className="container">
             <motion.div className="section-heading" {...fadeInUp}>
-              <p className="section-kicker">Selected Work</p>
               <h2>Featured Projects</h2>
             </motion.div>
+            {loading && <p className="projects-loading" role="status">Loading projects…</p>}
+            {!loading && displayProjects.length === 0 && (
+              <p className="projects-loading">No featured projects to display.</p>
+            )}
             <div className="projects-grid">
               {displayProjects.map((p, i) => (
                 <ProjectCard
@@ -112,8 +130,7 @@ const Home = () => {
               <p className="section-kicker">About Me</p>
               <h2 className="about-title-lg">Driven by design, guided by code.</h2>
               <div className="about-description-lg">
-                <p>I’m a Software Engineering student who enjoys building things that feel both clean and meaningful. Focused on structure, detail, and creating experiences that actually make sense.</p>
-                <p>Building. Learning. Improving.</p>
+                <p>I study software engineering in Ankara and build full-stack web projects. I enjoy working across the stack, from laying out a storefront to designing how orders and stock are stored.</p>
               </div>
               <div className="stack-wrap-lg">
                 {techStack.map((s, i) => (
@@ -133,17 +150,17 @@ const Home = () => {
                 <form className="contact-form" onSubmit={handleSubmit}>
                   <div className="input-row">
                     <div className="input-group">
-                      <label>Full Name</label>
-                      <input type="text" placeholder="Agshin Heybatli" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
+                      <label htmlFor="contact-name">Full Name</label>
+                      <input id="contact-name" type="text" placeholder="Agshin Heybatli" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
                     </div>
                     <div className="input-group">
-                      <label>Email Address</label>
-                      <input type="email" placeholder="example@email.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+                      <label htmlFor="contact-email">Email Address</label>
+                      <input id="contact-email" type="email" placeholder="example@email.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
                     </div>
                   </div>
                   <div className="input-group">
-                    <label>Message</label>
-                    <textarea placeholder="How can I help you?" rows="6" value={formData.text} onChange={(e) => setFormData({...formData, text: e.target.value})} required></textarea>
+                    <label htmlFor="contact-message">Message</label>
+                    <textarea id="contact-message" placeholder="How can I help you?" rows="6" value={formData.text} onChange={(e) => setFormData({...formData, text: e.target.value})} required></textarea>
                   </div>
                   <motion.button type="submit" className="btn btn-primary send-btn" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>Send Message</motion.button>
                 </form>

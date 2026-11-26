@@ -31,8 +31,7 @@ const Projects = () => {
             <Link to="/" className="back-link">← Back to Home</Link>
 
             <motion.div className="section-heading" {...fadeInUp}>
-              <p className="section-kicker">All Work</p>
-              <h2>Every Project</h2>
+              <h1>Projects</h1>
             </motion.div>
 
             {loading ? (
