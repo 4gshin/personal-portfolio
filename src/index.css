@@ -301,7 +301,15 @@ img { max-width: 100%; display: block; }
 
 .page-shell .project-card:hover,
 .page-shell .project-card:focus-within { transform: none; border-color: var(--portfolio-accent); }
-.project-card-image { width: 100%; height: auto; border-bottom: 1px solid var(--portfolio-line); }
+.project-card-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1152 / 585;
+  object-fit: cover;
+  object-position: top;
+  background: var(--portfolio-bg);
+  border-bottom: 1px solid var(--portfolio-line);
+}
 .project-card .card-content { padding: 24px 24px 48px; }
 .page-shell .project-type { color: var(--portfolio-muted); }
 .page-shell .project-card h3 { font-size: clamp(19px, 2vw, 27px); line-height: 1.2; }
