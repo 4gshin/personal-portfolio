@@ -73,28 +73,27 @@ const Home = () => {
       <main>
         <section className="hero-section">
           <div className="container hero-content">
-            <div className="hero-intro">
+            <div className="hero-masthead">
               <p className="hero-role">Full-stack developer · Ankara</p>
-              <h1 className="hero-title">Agshin<br />Heybatli<span>.</span></h1>
-              <p className="hero-text">Software engineering student at OSTİM Technical University. I build web apps from the interface to the database.</p>
-              <div className="hero-actions">
-                <a href="#projects" className="btn btn-primary">View Projects <span aria-hidden="true">↓</span></a>
-                <a href="#contact" className="btn btn-secondary">Contact Me</a>
-              </div>
+              <h1 className="hero-title">Agshin Heybatli</h1>
             </div>
+            <div className="hero-body">
+              <div className="hero-intro">
+                <p className="hero-text">Software engineering student at OSTİM Technical University. I build web apps from the interface to the database.</p>
+                <div className="hero-actions">
+                  <a href="#projects" className="btn btn-primary">View Projects <span aria-hidden="true">↓</span></a>
+                  <a href="#contact" className="hero-contact">Contact Me</a>
+                </div>
+              </div>
 
-            <a className="hero-showcase" href="https://flowershop-flax.vercel.app/" target="_blank" rel="noreferrer" aria-label="Open the FlowerShop live demo">
-              <div className="showcase-bar" aria-hidden="true">
-                <span className="showcase-dots"><i /><i /><i /></span>
-                <span>FlowerShop</span>
-                <span>↗</span>
-              </div>
-              <img src="/flowershop-preview.webp" alt="FlowerShop storefront homepage" width="1152" height="585" fetchPriority="high" />
-              <div className="showcase-caption">
-                <span>E-commerce storefront</span>
-                <span>Live demo <span aria-hidden="true">↗</span></span>
-              </div>
-            </a>
+              <a className="hero-showcase" href="https://flowershop-flax.vercel.app/" target="_blank" rel="noreferrer" aria-label="Open the FlowerShop live demo">
+                <img src="/flowershop-preview.webp" alt="FlowerShop storefront homepage" width="1152" height="585" fetchPriority="high" />
+                <div className="showcase-caption">
+                  <span><strong>FlowerShop</strong> <span className="showcase-description">/ E-commerce storefront</span></span>
+                  <span>Live demo <span aria-hidden="true">↗</span></span>
+                </div>
+              </a>
+            </div>
           </div>
         </section>
 
