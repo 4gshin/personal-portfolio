@@ -26,69 +26,6 @@ body {
   overflow-x: hidden;
 }
 
-/* --- 1. HOME & PORTFOLIO MODAL FIX --- */
-.modal-overlay {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000 !important;
-  padding: 20px;
-}
-
-.modal-content {
-  background: var(--admin-panel);
-  border: 1px solid var(--admin-border);
-  border-radius: 28px;
-  width: 100%;
-  max-width: 700px;
-  padding: 40px;
-  position: relative;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-  animation: adminFade 0.3s ease;
-}
-
-.close-modal {
-  position: absolute;
-  top: 25px;
-  right: 25px;
-  background: none;
-  border: none;
-  color: var(--admin-muted);
-  font-size: 32px;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.close-modal:hover { color: #fff; transform: rotate(90deg); }
-
-.modal-footer {
-  display: flex;
-  gap: 15px;
-  margin-top: 30px;
-}
-
-@media (max-width: 600px) {
-  .modal-content {
-    padding: 30px 20px; 
-  }
-  .modal-footer {
-    flex-direction: column; 
-  }
-  .modal-footer .btn {
-    width: 100%; 
-    justify-content: center;
-  }
-}
-
 /* --- 2. ADMIN LOGIN PAGE --- */
 .admin-loading,
 .admin-login-page {

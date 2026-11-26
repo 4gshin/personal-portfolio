@@ -363,3 +363,50 @@ img { max-width: 100%; display: block; }
   .page-shell .hero-showcase:hover, .page-shell .btn:hover { transform: none; }
   .page-shell .status-dot { animation: none; }
 }
+
+.project-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(740px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overscroll-behavior: contain;
+  padding: 0;
+  border: 1px solid var(--portfolio-line);
+  border-radius: 16px;
+  background: var(--portfolio-surface);
+  color: var(--portfolio-text);
+}
+
+.project-dialog::backdrop { background: #060909cf; backdrop-filter: blur(6px); }
+html:has(.project-dialog[open]) { overflow: hidden; }
+
+.project-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: clamp(16px, 4vw, 28px);
+}
+
+.project-dialog-header .project-type { margin-bottom: 5px; }
+.project-dialog-header h2 { font-size: clamp(22px, 4vw, 38px); line-height: 1.15; }
+
+.project-dialog-close {
+  flex: 0 0 42px;
+  height: 42px;
+  border: 1px solid var(--portfolio-line);
+  border-radius: 8px;
+  background: var(--portfolio-bg);
+  color: var(--portfolio-text);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.project-dialog-close:hover { border-color: var(--portfolio-accent); }
+.project-dialog .project-card-image { border-top: 1px solid var(--portfolio-line); }
+.project-dialog-body { padding: clamp(16px, 4vw, 28px); }
+.project-dialog-body p { color: var(--portfolio-muted); white-space: pre-line; overflow-wrap: anywhere; }
+.project-dialog-body .project-stack { list-style: none; margin-top: 16px; }
+.project-dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }

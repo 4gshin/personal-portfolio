@@ -1,44 +1,63 @@
-import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useId, useRef } from 'react';
+import ProjectCover from './ProjectCover.jsx';
 
-// Seçilmiş layihənin detallarını göstərən modal.
-// Həm Home, həm də /projects səhifəsi bunu paylaşır.
-const ProjectModal = ({ project, onClose }) => {
+export default function ProjectModal({ project, onClose }) {
+  const dialogRef = useRef(null);
+  const headingId = useId();
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (project && !dialog.open) dialog.showModal();
+    if (!project && dialog.open) dialog.close();
+  }, [project]);
+
   return (
-    <AnimatePresence>
+    <dialog
+      ref={dialogRef}
+      className="project-dialog"
+      aria-labelledby={headingId}
+      onCancel={event => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={event => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
       {project && (
-        <div className="modal-overlay" onClick={onClose}>
-          <motion.div
-            className="modal-content"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button className="close-modal" onClick={onClose}>×</button>
-            <span className="project-type">{project.type}</span>
-            <h2>{project.title}</h2>
-            <div className="modal-body">
-              <p>{project.detailedDescription || project.description}</p>
-              <div className="project-stack" style={{ marginTop: '20px' }}>
-                {project.stack?.map((s, j) => (
-                  <span key={j} className="mini-pill">{s}</span>
+        <article className="project-dialog-content">
+          <header className="project-dialog-header">
+            <div>
+              <span className="project-type">{project.type}</span>
+              <h2 id={headingId}>{project.title}</h2>
+            </div>
+            <button type="button" className="project-dialog-close" aria-label="Close project details" onClick={onClose}>
+              <span aria-hidden="true">×</span>
+            </button>
+          </header>
+          <ProjectCover project={project} alt={project.title + ' screenshot'} loading="eager" />
+          <div className="project-dialog-body">
+            <p>{project.detailedDescription || project.description}</p>
+            {project.stack?.length > 0 && (
+              <ul className="project-stack" aria-label="Technologies">
+                {project.stack.map((item, index) => (
+                  <li key={index} className="mini-pill">{item}</li>
                 ))}
+              </ul>
+            )}
+            {(project.githubLink || project.liveLink) && (
+              <div className="project-dialog-actions">
+                {project.liveLink && (
+                  <a href={project.liveLink} target="_blank" rel="noreferrer" className="btn btn-primary">Live Demo</a>
+                )}
+                {project.githubLink && (
+                  <a href={project.githubLink} target="_blank" rel="noreferrer" className="btn btn-secondary">View on GitHub</a>
+                )}
               </div>
-            </div>
-            <div className="modal-footer">
-              {project.githubLink && (
-                <a href={project.githubLink} target="_blank" rel="noreferrer" className="btn btn-secondary">GitHub</a>
-              )}
-              {project.liveLink && (
-                <a href={project.liveLink} target="_blank" rel="noreferrer" className="btn btn-primary">Live Demo</a>
-              )}
-            </div>
-          </motion.div>
-        </div>
+            )}
+          </div>
+        </article>
       )}
-    </AnimatePresence>
+    </dialog>
   );
-};
-
-export default ProjectModal;
+}
