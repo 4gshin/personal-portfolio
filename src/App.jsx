@@ -133,8 +133,7 @@ const Home = () => {
               <p className="section-kicker">About Me</p>
               <h2 className="about-title-lg">Driven by design, guided by code.</h2>
               <div className="about-description-lg">
-                <p>I’m a software engineering student at OSTİM Technical University in Ankara. I build web apps across the stack, from the screens people use to the APIs and databases behind them.</p>
-                <p>In FlowerShop, I worked on the storefront, checkout, and order management. In my GIS project, I built an interactive map for editing geographic features backed by PostGIS.</p>
+                <p>I’m a software engineering student at OSTİM Technical University in Ankara, with a focus on full-stack web development. What draws me to it is seeing how the interface, server, and database fit together to make an app easy to use and maintain.</p>
               </div>
               <div className="stack-wrap-lg">
                 {CORE_STACK.map(technology => (
