@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import AdminAuditLog from '../components/AdminAuditLog.jsx';
 import '../App.css';
 
 const getApiUrl = () => import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -284,6 +285,13 @@ const Admin = () => {
           >
             <span>▣</span> Projects
           </button>
+          <button
+            className={activeTab === 'audit' ? 'active' : ''}
+            aria-current={activeTab === 'audit' ? 'page' : undefined}
+            onClick={() => setActiveTab('audit')}
+          >
+            <span aria-hidden="true">≡</span> Audit Log
+          </button>
         </nav>
 
         <button onClick={handleLogout} className="admin-sidebar-logout">
@@ -292,6 +300,8 @@ const Admin = () => {
       </aside>
 
       <main className="admin-main">
+        {activeTab === 'audit' && <AdminAuditLog apiBase={API_BASE} />}
+
         {activeTab === 'dashboard' && (
           <section className="admin-view">
             <div className="admin-page-heading">

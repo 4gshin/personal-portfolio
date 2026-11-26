@@ -248,3 +248,34 @@ body {
   .admin-main { margin-left: 0; padding: 28px 18px; }
   .admin-stats-grid { grid-template-columns: 1fr; }
 }
+.admin-audit-heading,
+.admin-audit-event {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-audit-list {
+  list-style: none;
+  padding: 0;
+}
+
+.admin-audit-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+  color: var(--admin-muted);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-audit-warning {
+  color: #fca5a5;
+}
+
+@media (max-width: 900px) {
+  .admin-dashboard { flex-direction: column; }
+}
