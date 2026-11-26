@@ -12,6 +12,7 @@ const emptyProject = {
   type: '',
   githubLink: '',
   liveLink: '',
+  imageUrl: '',
   featured: false,
   order: 0
 };
@@ -147,6 +148,7 @@ const Admin = () => {
       type: project.type || '',
       githubLink: project.githubLink || '',
       liveLink: project.liveLink || '',
+      imageUrl: project.imageUrl || '',
       featured: Boolean(project.featured),
       order: project.order || 0
     });
@@ -424,6 +426,18 @@ const Admin = () => {
                   onChange={(e) => handleProjectChange('liveLink', e.target.value)}
                 />
               </div>
+
+              <label>
+                Project cover image (optional)
+                <input
+                  type="url"
+                  placeholder="https://example.com/project-cover.webp"
+                  pattern="https://.+"
+                  maxLength={2048}
+                  value={projectForm.imageUrl}
+                  onChange={(e) => handleProjectChange('imageUrl', e.target.value)}
+                />
+              </label>
 
               <div className="admin-featured-row">
                 <label className="admin-featured-toggle">

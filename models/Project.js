@@ -8,6 +8,7 @@ const projectSchema = new mongoose.Schema({
   type: { type: String }, // MÉ™sÉ™lÉ™n: "Full-Stack", "Frontend"
   githubLink: { type: String },
   liveLink: { type: String },
+  imageUrl: { type: String, trim: true, maxlength: 2048 },
   featured: { type: Boolean, default: false }, // Ana sÉ™hifÉ™dÉ™ gÃ¶stÉ™rilsinmi?
   order: { type: Number, default: 0 }, // Ana sÉ™hifÉ™dÉ™ sÄ±ra (1 = birinci). 0/boÅŸ = sÄ±rasÄ±z, sona dÃ¼ÅŸÃ¼r.
   createdAt: { type: Date, default: Date.now }

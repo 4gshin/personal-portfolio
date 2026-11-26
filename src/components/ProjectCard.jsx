@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+import ProjectCover from './ProjectCover.jsx';
+
 // Tək layihə kartı — Home-dakı "Featured Projects" grid-i ilə
 // /projects səhifəsindəki tam siyahı eyni kartı istifadə edir.
 const ProjectCard = ({ project, index = 0, onClick }) => {
@@ -15,20 +17,23 @@ const ProjectCard = ({ project, index = 0, onClick }) => {
     <motion.div
       className="project-card"
       {...fadeInUp}
-      transition={{ delay: index * 0.1 }}
-      whileHover={{ y: -10 }}
-      onClick={onClick}
-      style={{ cursor: 'pointer' }}
+      transition={{ delay: index * 0.08 }}
     >
+      <ProjectCover project={project} />
       <div className="card-content">
         <span className="project-type">{project.type}</span>
-        <h3>{project.title}</h3>
+        <h3>
+          <button type="button" className="project-card-link" onClick={onClick}>
+            {project.title}
+          </button>
+        </h3>
         <p>{project.description}</p>
         <div className="project-stack">
           {project.stack?.map((s, j) => (
             <span key={j} className="mini-pill">{s}</span>
           ))}
         </div>
+        <span className="project-card-arrow" aria-hidden="true">↗</span>
       </div>
     </motion.div>
   );
