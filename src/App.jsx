@@ -17,6 +17,10 @@ const getApiUrl = () => import.meta.env.VITE_API_URL || "http://localhost:5001/a
 // Ana səhifədə maksimum neçə layihə göstərilsin (admin paneldən "featured" seçilənlər,
 // heç biri seçilməyibsə isə ən son əlavə olunanlar).
 const FEATURED_LIMIT = 3;
+const CORE_STACK = [
+  'JavaScript', 'TypeScript', 'React', 'Node.js', 'Express',
+  'PostgreSQL', 'Prisma', 'MongoDB', 'PostGIS'
+];
 
 // Admin paneldən verilən "order" dəyərinə görə sıralayır (1 = birinci).
 // order verilməyib / 0-dırsa, o layihə sıra siyahısının sonuna düşür və
@@ -60,7 +64,6 @@ const Home = () => {
     } catch (error) { toast.error("Server connection error!"); }
   };
 
-  const techStack = ["JavaScript", "React", "Node.js", "Express", "MongoDB", "Git", "Vite"];
   const fadeInUp = { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.6 } };
 
   return (
@@ -130,11 +133,12 @@ const Home = () => {
               <p className="section-kicker">About Me</p>
               <h2 className="about-title-lg">Driven by design, guided by code.</h2>
               <div className="about-description-lg">
-                <p>I study software engineering in Ankara and build full-stack web projects. I enjoy working across the stack, from laying out a storefront to designing how orders and stock are stored.</p>
+                <p>I’m a software engineering student at OSTİM Technical University in Ankara. I build web apps across the stack, from the screens people use to the APIs and databases behind them.</p>
+                <p>In FlowerShop, I worked on the storefront, checkout, and order management. In my GIS project, I built an interactive map for editing geographic features backed by PostGIS.</p>
               </div>
               <div className="stack-wrap-lg">
-                {techStack.map((s, i) => (
-                  <motion.span key={i} className="stack-pill-lg" whileHover={{ scale: 1.1, backgroundColor: "#fff", color: "#000" }}>{s}</motion.span>
+                {CORE_STACK.map(technology => (
+                  <span key={technology} className="stack-pill-lg">{technology}</span>
                 ))}
               </div>
             </motion.div>
